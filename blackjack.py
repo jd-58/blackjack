@@ -2,7 +2,9 @@ import pygame
 import pygame_widgets as pw
 from pygame_widgets.button import Button
 from pygame_widgets.textbox import TextBox
+
 import random
+import pygame.freetype
 
 
 class Card:
@@ -91,7 +93,7 @@ screen_height = 720
 screen = pygame.display.set_mode((screen_width, screen_height))
 clock = pygame.time.Clock()
 running = True
-button = Button(
+button1 = Button(
     screen,
     screen_width // 2 - 50,  # X coordinate of the top-left corner
     100,  # Y coordinate of the top-left corner
@@ -104,6 +106,17 @@ button = Button(
     onClick=draw_cards_button
 )
 
+white = (255, 255, 255)
+blue = (0, 0, 128)
+
+text_font = pygame.font.SysFont("Arial", 18)
+
+
+def draw_text(text, font, text_color, x, y):
+    img = font.render(text, True,text_color)
+    screen.blit(img, (x, y))
+
+
 while running:
     events = pygame.event.get()
     for event in events:
@@ -112,10 +125,14 @@ while running:
 
     screen.fill("black")
 
+    draw_text("Your cards are: ", text_font, (255, 255, 255), screen_width//2 - 25, 550)
+    draw_text(str(user1.show_hand()), text_font, (255, 255, 255), screen_width//2 - 25, 600)
+
     # Game code here
-    button.draw()
+    button1.draw()
 
     pygame.display.flip()
+    pygame.display.update()
 
     pw.update(events)
     clock.tick(60)
