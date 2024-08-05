@@ -80,11 +80,14 @@ user1 = User("jacob")
 deck = Deck()
 deck.shuffle_deck()
 
+dealer = User("Dealer")
+
 
 def draw_cards_button():
     user1.draw_user_card(deck, 2)
-    print(user1.show_hand())
-    return user1.get_hand()
+    dealer.draw_user_card(deck, 2)
+    print("User: ", user1.show_hand())
+    print("Dealer: ", dealer.show_hand())
 
 
 pygame.init()
@@ -96,10 +99,10 @@ running = True
 button1 = Button(
     screen,
     screen_width // 2 - 50,  # X coordinate of the top-left corner
-    100,  # Y coordinate of the top-left corner
+    400,  # Y coordinate of the top-left corner
     150,
     75,
-    text='Hello',
+    text='Draw cards',
     fontSize=20, margin=20,
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
@@ -127,6 +130,9 @@ while running:
 
     draw_text("Your cards are: ", text_font, (255, 255, 255), screen_width//2 - 25, 550)
     draw_text(str(user1.show_hand()), text_font, (255, 255, 255), screen_width//2 - 25, 600)
+
+    draw_text("Dealer's cards are: ", text_font, (255, 255, 255), screen_width // 2 - 25, 100)
+    draw_text(str(dealer.show_hand()), text_font, (255, 255, 255), screen_width // 2 - 25, 150)
 
     # Game code here
     button1.draw()
