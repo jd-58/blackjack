@@ -1,4 +1,7 @@
 import pygame
+import pygame_widgets as pw
+from pygame_widgets.button import Button
+from pygame_widgets.textbox import TextBox
 import random
 
 
@@ -9,6 +12,7 @@ class Card:
         """Initializes a card object with a value and a suit/"""
         self._value = value
         self._suit = suit
+        self._image = None
 
     def get_card(self):
         """Returns the string card value and then suit"""
@@ -49,6 +53,7 @@ class User:
         """Initializes a user object with a given username and empty hand"""
         self._username = username
         self._hand = []
+        self._bankroll = 1000
 
     def draw_user_card(self, game_deck, number_of_cards):
         """Adds a specified number of cards to the user's hand from the deck. Make sure the deck is shuffled."""
@@ -69,22 +74,50 @@ class User:
         return readable_card_list
 
 
+user1 = User("jacob")
+deck = Deck()
+deck.shuffle_deck()
+
+
+def draw_cards_button():
+    user1.draw_user_card(deck, 2)
+    print(user1.show_hand())
+    return user1.get_hand()
+
+
 pygame.init()
-screen = pygame.display.set_mode((1280, 720))
+screen_width = 1280
+screen_height = 720
+screen = pygame.display.set_mode((screen_width, screen_height))
 clock = pygame.time.Clock()
 running = True
+button = Button(
+    screen,
+    screen_width // 2 - 50,  # X coordinate of the top-left corner
+    100,  # Y coordinate of the top-left corner
+    150,
+    75,
+    text='Hello',
+    fontSize=20, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    onClick=draw_cards_button
+)
 
 while running:
-    for event in pygame.event.get():
+    events = pygame.event.get()
+    for event in events:
         if event.type == pygame.QUIT:
             running = False
 
     screen.fill("black")
 
-    # Render Game here
+    # Game code here
+    button.draw()
 
     pygame.display.flip()
 
+    pw.update(events)
     clock.tick(60)
 
 pygame.quit()
