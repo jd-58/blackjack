@@ -1,29 +1,6 @@
 import pygame
 import random
 
-"""
-pygame.init()
-screen = pygame.display.set_mode((1280, 720))
-clock = pygame.time.Clock()
-running = True
-
-
-
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-    screen.fill("purple")
-
-    #Render Game here
-
-    pygame.display.flip()
-
-    clock.tick(60)
-
-pygame.quit()"""
-
 
 class Card:
     """Creates a card object"""
@@ -65,14 +42,49 @@ class Deck:
         return self._cards.pop()
 
 
+class User:
+    """Creates a user"""
+
+    def __init__(self, username):
+        """Initializes a user object with a given username and empty hand"""
+        self._username = username
+        self._hand = []
+
+    def draw_user_card(self, game_deck, number_of_cards):
+        """Adds a specified number of cards to the user's hand from the deck. Make sure the deck is shuffled."""
+        i = 0
+        while i < number_of_cards:
+            self._hand.append(game_deck.draw_card())
+            i += 1
+
+    def get_hand(self):
+        """Returns the user's hand"""
+        return self._hand
+
+    def show_hand(self):
+        """Returns the user's hand with the value and suit in string form"""
+        readable_card_list = []
+        for card in self._hand:
+            readable_card_list.append(card.get_card())
+        return readable_card_list
 
 
+pygame.init()
+screen = pygame.display.set_mode((1280, 720))
+clock = pygame.time.Clock()
+running = True
 
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
+    screen.fill("black")
 
-deck = Deck()
-deck.shuffle_deck()
-card1 = deck.draw_card()
-print(card1.get_card())
+    # Render Game here
 
+    pygame.display.flip()
 
+    clock.tick(60)
+
+pygame.quit()
