@@ -42,11 +42,12 @@ class Deck:
     """Creates a deck object"""
 
     def __init__(self):
-        """Initializes a standard 52 card deck."""
+        """Initializes a standard 52 card deck and creates an unshuffled deck."""
         self._cards = []
+        self.create_deck()
 
     def create_deck(self):
-        """Creates 52 card objects and adds them to the deck"""
+        """Creates 52 card objects (un-shuffled) and adds them to the deck"""
         for suit in ("spades", "diamonds", "clubs", "hearts"):
             for value in range(2, 15):
                 self._cards.append(Card(value, suit))
@@ -56,10 +57,17 @@ class Deck:
         return self._cards
 
 
+def shuffle_deck(deck_of_cards):
+    """Takes a list of cards and shuffles them."""
+    return random.shuffle(deck_of_cards)
+
+
 testcard = Card("3", "clubs")
 print(testcard.get_card())
 
 deck = Deck()
-deck.create_deck()
 finished_deck = deck.get_deck()
-print(finished_deck[12].get_card())
+shuffle_deck(finished_deck)
+print(finished_deck[0].get_card())
+
+
