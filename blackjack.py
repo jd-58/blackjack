@@ -56,18 +56,23 @@ class Deck:
         """Returns the current deck"""
         return self._cards
 
+    def shuffle_deck(self):
+        """Takes a list of cards and shuffles them."""
+        return random.shuffle(self._cards)
 
-def shuffle_deck(deck_of_cards):
-    """Takes a list of cards and shuffles them."""
-    return random.shuffle(deck_of_cards)
+    def draw_card(self):
+        """Draws a card and removes it from the deck"""
+        return self._cards.pop()
 
 
-testcard = Card("3", "clubs")
-print(testcard.get_card())
+
+
+
+
 
 deck = Deck()
-finished_deck = deck.get_deck()
-shuffle_deck(finished_deck)
-print(finished_deck[0].get_card())
+deck.shuffle_deck()
+card1 = deck.draw_card()
+print(card1.get_card())
 
 
