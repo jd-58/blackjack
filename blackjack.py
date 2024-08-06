@@ -10,15 +10,39 @@ import pygame.freetype
 class Card:
     """Creates a card object"""
 
-    def __init__(self, value, suit):
+    def __init__(self, value, suit, face_up=True):
         """Initializes a card object with a value and a suit/"""
         self._value = value
         self._suit = suit
         self._image = None
+        self._face_up = face_up
 
     def get_card(self):
         """Returns the string card value and then suit"""
-        return str(self._value) + str(self._suit)
+        if self._face_up is True:
+            return str(self._value) + str(self._suit)
+        else:
+            return "Face Down"
+
+    def get_face_up(self):
+        """Returns a true value (default) if a card should be face up, and false if it should be face down"""
+        return self._face_up
+
+    def get_image(self):
+        """Returns the image file name associated with the card"""
+        return self._image
+
+    def get_value(self):
+        """Returns the value of the selected card"""
+        return self._value
+
+    def set_face_up(self, face_up_value):
+        """Sets a card's face up value. True if face up, False if face down."""
+        self._face_up = face_up_value
+
+    def set_image(self, image_title):
+        """Set's a card's image title."""
+        self._image = image_title
 
 
 class Deck:
@@ -56,6 +80,7 @@ class User:
         self._username = username
         self._hand = []
         self._bankroll = 1000
+        self._score = 0
 
     def draw_user_card(self, game_deck, number_of_cards):
         """Adds a specified number of cards to the user's hand from the deck. Make sure the deck is shuffled."""
@@ -67,6 +92,33 @@ class User:
     def get_hand(self):
         """Returns the user's hand"""
         return self._hand
+
+    def get_score(self):
+        """Returns the user's current score"""
+        return self._score
+
+    def get_hand_value(self):
+        """Gets the value of the user's current hand"""
+        current_value = 0
+        for card in self._hand:
+            current_value += card.get_value()
+        return current_value
+
+    def get_username(self):
+        """Returns the user's current username"""
+        return self._username
+
+    def set_username(self, new_username):
+        """Changes the user's username"""
+        self._username = new_username
+
+    def set_score(self, new_score):
+        """Changes the user's score"""
+        self._score = new_score
+
+    def update_score(self):
+        """Updates the user's score to reflect their current hand"""
+        self._score = self.get_hand_value()
 
     def show_hand(self):
         """Returns the user's hand with the value and suit in string form"""
@@ -82,12 +134,15 @@ deck.shuffle_deck()
 
 dealer = User("Dealer")
 
+blackjack = 21
+
 
 def draw_cards_button():
     user1.draw_user_card(deck, 2)
     dealer.draw_user_card(deck, 2)
-    print("User: ", user1.show_hand())
-    print("Dealer: ", dealer.show_hand())
+    dealer_hand = dealer.get_hand()
+    dealer_hand[1].set_face_up(False)
+
 
 
 pygame.init()
@@ -116,7 +171,7 @@ text_font = pygame.font.SysFont("Arial", 18)
 
 
 def draw_text(text, font, text_color, x, y):
-    img = font.render(text, True,text_color)
+    img = font.render(text, True, text_color)
     screen.blit(img, (x, y))
 
 
@@ -128,8 +183,12 @@ while running:
 
     screen.fill("black")
 
-    draw_text("Your cards are: ", text_font, (255, 255, 255), screen_width//2 - 25, 550)
-    draw_text(str(user1.show_hand()), text_font, (255, 255, 255), screen_width//2 - 25, 600)
+    draw_text("Your cards are: ", text_font, white, screen_width//2 - 25, 550)
+    draw_text(str(user1.show_hand()), text_font, white, screen_width//2 - 25, 600)
+
+    draw_text("Your score: ", text_font, white, screen_width // 2 + 250, 550)
+    draw_text(str(user1.get_hand_value()), text_font, white, screen_width // 2 + 350, 550)
+
 
     draw_text("Dealer's cards are: ", text_font, (255, 255, 255), screen_width // 2 - 25, 100)
     draw_text(str(dealer.show_hand()), text_font, (255, 255, 255), screen_width // 2 - 25, 150)
