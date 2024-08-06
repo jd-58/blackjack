@@ -49,7 +49,7 @@ class Deck:
     """Creates a deck object"""
 
     def __init__(self):
-        """Initializes a standard 52 card deck and creates an unshuffled deck."""
+        """Initializes a standard 52 card deck and creates an un-shuffled deck."""
         self._cards = []
         self.create_deck()
 
@@ -137,12 +137,24 @@ dealer = User("Dealer")
 blackjack = 21
 
 
-def draw_cards_button():
+def draw_cards_button_func():
     user1.draw_user_card(deck, 2)
     dealer.draw_user_card(deck, 2)
     dealer_hand = dealer.get_hand()
     dealer_hand[1].set_face_up(False)
 
+
+def check_dealer_score():
+    """if dealer.get_hand_value() < 16:
+        dealer.draw_user_card(deck, 1)
+        print("Drawing card")"""
+    if dealer.get_hand_value() > 17:
+        for card in dealer.get_hand():
+            card.set_face_up(True)
+
+
+def hit():
+    user1.draw_user_card(deck, 1)
 
 
 pygame.init()
@@ -151,17 +163,30 @@ screen_height = 720
 screen = pygame.display.set_mode((screen_width, screen_height))
 clock = pygame.time.Clock()
 running = True
-button1 = Button(
+deal_cards_button = Button(
     screen,
     screen_width // 2 - 50,  # X coordinate of the top-left corner
     400,  # Y coordinate of the top-left corner
-    150,
-    75,
+    125,
+    25,
     text='Draw cards',
     fontSize=20, margin=20,
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
-    onClick=draw_cards_button
+    onClick=draw_cards_button_func
+)
+
+hit_button = Button(
+    screen,
+    screen_width // 2 + 350,  # X coordinate of the top-left corner
+    400,  # Y coordinate of the top-left corner
+    75,
+    25,
+    text='Hit',
+    fontSize=20, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    onClick=hit
 )
 
 white = (255, 255, 255)
@@ -181,6 +206,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    # Game code here
     screen.fill("black")
 
     draw_text("Your cards are: ", text_font, white, screen_width//2 - 25, 550)
@@ -189,15 +215,19 @@ while running:
     draw_text("Your score: ", text_font, white, screen_width // 2 + 250, 550)
     draw_text(str(user1.get_hand_value()), text_font, white, screen_width // 2 + 350, 550)
 
-
     draw_text("Dealer's cards are: ", text_font, (255, 255, 255), screen_width // 2 - 25, 100)
     draw_text(str(dealer.show_hand()), text_font, (255, 255, 255), screen_width // 2 - 25, 150)
 
-    # Game code here
-    button1.draw()
+    draw_text("Dealer's score: ", text_font, white, screen_width // 2 + 250, 100)
+    draw_text(str(dealer.get_hand_value()), text_font, white, screen_width // 2 + 350, 100)
+
+    deal_cards_button.draw()
+    hit_button.draw()
 
     pygame.display.flip()
     pygame.display.update()
+
+    check_dealer_score()
 
     pw.update(events)
     clock.tick(60)
