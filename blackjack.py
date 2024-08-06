@@ -7,6 +7,8 @@ import random
 import pygame.freetype
 
 
+# To try and embedd my game in browser: https://pygame-web.github.io/#demos-on-itchio
+
 class Card:
     """Creates a card object"""
 
