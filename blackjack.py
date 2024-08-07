@@ -1,4 +1,4 @@
-import pygame
+# import pygame
 import pygame_widgets as pw
 from pygame_widgets.button import Button
 from pygame_widgets.textbox import TextBox
@@ -18,7 +18,8 @@ class Card:
         self._suit = suit
         self._image = None
         self._face_up = face_up
-        self._name = str(name) + " " + str(self._suit)
+        self._name = str(name)
+        self._name_and_suit = str(name) + " " + str(self._suit)
 
     def get_card(self):
         """Returns the string card value and then suit"""
@@ -45,6 +46,13 @@ class Card:
     def get_value(self):
         """Returns the value of the selected card"""
         return self._value
+
+    def get_name_and_suit(self):
+        """Returns the card's name with the suit attached"""
+        if self._face_up is True:
+            return str(self._name_and_suit)
+        else:
+            return "Face down"
 
     def set_face_up(self, face_up_value):
         """Sets a card's face up value. True if face up, False if face down."""
@@ -154,6 +162,10 @@ class User:
         """Changes the user's username"""
         self._username = new_username
 
+    def set_hand(self, specified_hand):
+        """Changes the user's hand. For testing purposes"""
+        self._hand = specified_hand
+
     def set_turn_result(self, new_turn_result):
         """Changes the user's current turn result"""
         self._turn_result = new_turn_result
@@ -174,7 +186,7 @@ class User:
         """Returns the user's hand with the value and suit in string form"""
         readable_card_list = []
         for card in self._hand:
-            readable_card_list.append(card.get_name())
+            readable_card_list.append(card.get_name_and_suit())
         return readable_card_list
 
     def clear_hand(self):
@@ -199,7 +211,15 @@ def draw_cards_button_func():
     user1.draw_user_card(deck, 2, True)
     dealer.draw_user_card(deck, 1, True)
     dealer.draw_user_card(deck, 1, False)
-    dealer_hand = dealer.get_hand()
+    initial_score_check()
+
+
+def draw_specific_cards_button_func():  # This is for testing certain hand combinations and results
+    card1 = Card(9, '9', 'hearts', True)
+    card2 = Card(9, '9', 'diamonds', True)
+    new_hand = [card1, card2]
+    user1.set_hand(new_hand)
+    dealer.set_hand(new_hand)
     initial_score_check()
 
 
@@ -225,8 +245,7 @@ def stand():
 
 
 def initial_score_check():
-    if (dealer.get_hand_value() == 21 and user1.get_hand_value() != 21  # Dealer gets 21 and player does not
-            or user1.get_hand_value() > 21):  # User busts
+    if user1.get_hand_value() > 21:  # User busts
         dealer.set_turn_result('win')
         user1.set_turn_result('loss')
     elif user1.get_hand_value() == 21 and dealer.get_hand_value() != 21:  # Player gets 21 and dealer does not
@@ -241,6 +260,33 @@ def clear_table():
     dealer.clear_hand()
 
 
+def check_for_user_ace():
+    user_hand = user1.get_hand()
+    for card in user_hand:
+        if card.get_value() == 11:
+            return True
+    return False
+
+
+def set_ace_to_1():
+    for card in user1.get_hand():
+        print(card.get_name())
+        if card.get_name() == 'ace':
+            card.set_value(1)
+            print(card.get_name_and_suit())
+            print(card.get_value())
+            return
+    return
+
+
+def set_ace_to_11():
+    for card in user1.get_hand():
+        if card.get_name() == 'ace':
+            card.set_value(11)
+            return
+    return
+
+
 def turn_over_check():
     if user1.get_turn_result() != 'in-progress' and dealer.get_turn_result() != 'in-progress':
         dealer_hand = dealer.get_hand()
@@ -249,15 +295,26 @@ def turn_over_check():
 
 
 def final_score_check():
-    if ((user1.get_hand_value() == 21 and dealer.get_hand_value() != 21  # User blackjack
+    if 21 >= user1.get_hand_value() == dealer.get_hand_value():
+        #  If the user and dealer tie
+        print('tie')
+        user1.set_turn_result('push')
+        dealer.set_turn_result('push')
+    elif ((user1.get_hand_value() == 21 and dealer.get_hand_value() != 21  # User blackjack
          or dealer.get_hand_value() < user1.get_hand_value() <= 21)  # Neither bust, user has higher hand
             or dealer.get_hand_value() > 21 >= user1.get_hand_value()):  # Dealer bust, user does not
         user1.set_turn_result('win')
         dealer.set_turn_result('loss')
+        print("user win")
     elif (user1.get_hand_value() > 21  # User bust
-          or user1.get_hand_value() < dealer.get_hand_value() <= 21):  # Neither bust, dealer has higher hand
+          or user1.get_hand_value() < dealer.get_hand_value() <= 21  # Neither bust, dealer has higher hand
+          or dealer.get_hand_value() == 21):  # Dealer blackjack
         user1.set_turn_result('loss')
         dealer.set_turn_result('win')
+        print("user lose")
+    print("no conditions apply")
+    return
+
 
 
 pygame.init()
@@ -318,6 +375,32 @@ clear_button = Button(  # TEMPORARY BUTTON
     onClick=clear_table
 )
 
+ace_choice_button_1 = Button(
+    screen,
+    screen_width // 2 - 600,  # X coordinate of the top-left corner
+    600,  # Y coordinate of the top-left corner
+    75,
+    25,
+    text='1',
+    fontSize=20, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    onClick=set_ace_to_1
+)
+
+ace_choice_button_11 = Button(
+    screen,
+    screen_width // 2 - 500,  # X coordinate of the top-left corner
+    600,  # Y coordinate of the top-left corner
+    75,
+    25,
+    text='11',
+    fontSize=20, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    onClick=set_ace_to_11
+)
+
 white = (255, 255, 255)
 blue = (0, 0, 128)
 black = (0, 0, 0)
@@ -364,6 +447,10 @@ while running:
     hit_button.draw()
     stand_button.draw()
     clear_button.draw()
+
+    # if check_for_user_ace() is True:
+    ace_choice_button_1.draw()
+    ace_choice_button_11.draw()
 
     pygame.display.flip()
     pygame.display.update()
