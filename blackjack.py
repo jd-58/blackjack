@@ -452,8 +452,8 @@ while running:
     draw_text("Dealer's cards are: ", text_font, black, screen_width // 2 - 25, 100)
     draw_text(str(dealer.show_hand()), text_font, black, screen_width // 2 - 25, 150)
 
-    draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
-    draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
+    # draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
+    # draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
 
     draw_text("Turn result: ", text_font, black, screen_width // 2 - 350, 100)
     draw_text(str(user1.get_turn_result()), text_font, black, screen_width // 2 - 250, 100)
