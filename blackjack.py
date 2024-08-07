@@ -12,23 +12,31 @@ import pygame.freetype
 class Card:
     """Creates a card object"""
 
-    def __init__(self, value, suit, face_up=True):
+    def __init__(self, value, name, suit, face_up=True):
         """Initializes a card object with a value and a suit/"""
         self._value = value
         self._suit = suit
         self._image = None
         self._face_up = face_up
+        self._name = str(name) + " " + str(self._suit)
 
     def get_card(self):
         """Returns the string card value and then suit"""
         if self._face_up is True:
-            return str(self._value) + str(self._suit)
+            return self._name
         else:
             return "Face Down"
 
     def get_face_up(self):
         """Returns a true value (default) if a card should be face up, and false if it should be face down"""
         return self._face_up
+
+    def get_name(self):
+        """Returns a card's name if it is face up"""
+        if self._face_up is True:
+            return str(self._name)
+        else:
+            return "Face down"
 
     def get_image(self):
         """Returns the image file name associated with the card"""
@@ -41,6 +49,14 @@ class Card:
     def set_face_up(self, face_up_value):
         """Sets a card's face up value. True if face up, False if face down."""
         self._face_up = face_up_value
+
+    def set_name(self, new_name):
+        """Sets a card's display name"""
+        self._name = new_name
+
+    def set_value(self, new_value):
+        """Changes a card's value"""
+        self._value = new_value
 
     def set_image(self, image_title):
         """Set's a card's image title."""
@@ -58,8 +74,12 @@ class Deck:
     def create_deck(self):
         """Creates 52 card objects (un-shuffled) and adds them to the deck"""
         for suit in ("spades", "diamonds", "clubs", "hearts"):
-            for value in range(2, 15):
-                self._cards.append(Card(value, suit))
+            for value in range(2, 11):
+                self._cards.append(Card(value, value, suit))  # Makes the 2-10 cards
+            self._cards.append(Card(10, "jack", suit))
+            self._cards.append(Card(10, "queen", suit))
+            self._cards.append(Card(10, "king", suit))
+            self._cards.append(Card(11, "ace", suit))
 
     def get_deck(self):
         """Returns the current deck"""
@@ -145,7 +165,7 @@ class User:
         """Returns the user's hand with the value and suit in string form"""
         readable_card_list = []
         for card in self._hand:
-            readable_card_list.append(card.get_card())
+            readable_card_list.append(card.get_name())
         return readable_card_list
 
     def clear_hand(self):
