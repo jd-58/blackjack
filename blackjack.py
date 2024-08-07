@@ -83,6 +83,7 @@ class User:
         self._hand = []
         self._bankroll = 1000
         self._score = 0
+        self._turn_result = 'in-progress'
 
     def draw_user_card(self, game_deck, number_of_cards):
         """Adds a specified number of cards to the user's hand from the deck. Make sure the deck is shuffled."""
@@ -94,6 +95,10 @@ class User:
     def get_hand(self):
         """Returns the user's hand"""
         return self._hand
+
+    def get_turn_result(self):
+        """Returns win if the user has won the hand, or loss if they have not"""
+        return self._turn_result
 
     def get_score(self):
         """Returns the user's current score"""
@@ -113,6 +118,10 @@ class User:
     def set_username(self, new_username):
         """Changes the user's username"""
         self._username = new_username
+
+    def set_turn_result(self, new_turn_result):
+        """Changes the user's current turn result"""
+        self._turn_result = new_turn_result
 
     def set_score(self, new_score):
         """Changes the user's score"""
@@ -157,6 +166,20 @@ def check_dealer_score():
 
 def hit():
     user1.draw_user_card(deck, 1)
+    if dealer.get_hand_value() < 17:
+        dealer.draw_user_card()
+
+
+def score_check():
+    if ((user1.get_hand_value() == 21 and dealer.get_hand_value() != 21  # User blackjack
+         or dealer.get_hand_value() < user1.get_hand_value() <= 21)  # Neither bust, user has higher hand
+            or dealer.get_hand_value() > 21 >= user1.get_hand_value()):  # Dealer bust, user does not
+        user1.set_turn_result('win')
+        dealer.set_turn_result('loss')
+    elif (user1.get_hand_value() > 21 >= dealer.get_hand_value()  # User bust, dealer does not
+          or user1.get_hand_value() < dealer.get_hand_value() <= 21):  # Neither bust, dealer has higher hand
+        user1.set_turn_result('loss')
+        dealer.set_turn_result('win')
 
 
 pygame.init()
