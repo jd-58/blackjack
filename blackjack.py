@@ -166,6 +166,7 @@ blackjack = 21
 
 
 def draw_cards_button_func():
+    deck.shuffle_deck()
     user1.draw_user_card(deck, 2, True)
     dealer.draw_user_card(deck, 1, True)
     dealer.draw_user_card(deck, 1, False)
@@ -310,8 +311,8 @@ while running:
     draw_text("Dealer's cards are: ", text_font, (255, 255, 255), screen_width // 2 - 25, 100)
     draw_text(str(dealer.show_hand()), text_font, (255, 255, 255), screen_width // 2 - 25, 150)
 
-    draw_text("Dealer's score: ", text_font, white, screen_width // 2 + 250, 100)
-    draw_text(str(dealer.get_hand_value()), text_font, white, screen_width // 2 + 350, 100)
+    # draw_text("Dealer's score: ", text_font, white, screen_width // 2 + 250, 100)
+    # draw_text(str(dealer.get_hand_value()), text_font, white, screen_width // 2 + 350, 100)
 
     draw_text("Turn result: ", text_font, white, screen_width // 2 - 350, 100)
     draw_text(str(user1.get_turn_result()), text_font, white, screen_width // 2 - 250, 100)
