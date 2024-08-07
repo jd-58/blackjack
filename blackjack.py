@@ -1,4 +1,4 @@
-# import pygame
+import pygame
 import pygame_widgets as pw
 from pygame_widgets.button import Button
 from pygame_widgets.textbox import TextBox
