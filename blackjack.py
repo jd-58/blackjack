@@ -9,6 +9,10 @@ import pygame.freetype
 
 # To try and embedd my game in browser: https://pygame-web.github.io/#demos-on-itchio
 
+# TO-DO: if dealer gets an ace, and it switches to 1, I have to hit the stand button twice to get the turn to
+# count as a win. look into adding a function for ace checking and score updating.
+# ACTUALLY THIS DOESN'T ALWAYS HAPPEN. IDK WHY
+
 class Card:
     """Creates a card object"""
 
@@ -310,15 +314,14 @@ def final_score_check():
         for card in dealer.get_hand():
             if card.get_name() == 'ace':
                 card.set_value(1)
-                return
     if 21 >= user1.get_hand_value() == dealer.get_hand_value():
         #  If the user and dealer tie
         print('tie')
         user1.set_turn_result('push')
         dealer.set_turn_result('push')
     elif ((user1.get_hand_value() == 21 and dealer.get_hand_value() != 21  # User blackjack
-         or dealer.get_hand_value() < user1.get_hand_value() <= 21)  # Neither bust, user has higher hand
-            or dealer.get_hand_value() > 21 >= user1.get_hand_value()):  # Dealer bust, user does not
+          or dealer.get_hand_value() < user1.get_hand_value() <= 21)  # Neither bust, user has higher hand
+          or dealer.get_hand_value() > 21 >= user1.get_hand_value()):  # Dealer bust, user does not
         user1.set_turn_result('win')
         dealer.set_turn_result('loss')
         print("user win")
@@ -330,7 +333,6 @@ def final_score_check():
         print("user lose")
     print("no conditions apply")
     return
-
 
 
 pygame.init()
