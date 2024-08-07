@@ -215,7 +215,7 @@ def draw_cards_button_func():
 
 
 def draw_specific_cards_button_func():  # This is for testing certain hand combinations and results
-    card1 = Card(9, '9', 'hearts', True)
+    card1 = Card(11, 'ace', 'hearts', True)
     card2 = Card(9, '9', 'diamonds', True)
     new_hand = [card1, card2]
     user1.set_hand(new_hand)
@@ -231,7 +231,13 @@ def check_dealer_score():
 
 def hit():
     user1.draw_user_card(deck, 1, True)
+    user_han = user1.get_hand()
+    is_ace = False
     if user1.get_hand_value() > 21:
+        for card in user1.get_hand():
+            if card.get_name() == 'ace':
+                card.set_value(1)
+                return
         user1.set_turn_result('loss')
         dealer.set_turn_result('win')
 
@@ -295,6 +301,16 @@ def turn_over_check():
 
 
 def final_score_check():
+    if user1.get_hand_value() > 21:
+        for card in user1.get_hand():
+            if card.get_name() == 'ace':
+                card.set_value(1)
+                return
+    if dealer.get_hand_value() > 21:
+        for card in dealer.get_hand():
+            if card.get_name() == 'ace':
+                card.set_value(1)
+                return
     if 21 >= user1.get_hand_value() == dealer.get_hand_value():
         #  If the user and dealer tie
         print('tie')
@@ -434,8 +450,8 @@ while running:
     draw_text("Dealer's cards are: ", text_font, black, screen_width // 2 - 25, 100)
     draw_text(str(dealer.show_hand()), text_font, black, screen_width // 2 - 25, 150)
 
-    # draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
-    # draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
+    draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
+    draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
 
     draw_text("Turn result: ", text_font, black, screen_width // 2 - 350, 100)
     draw_text(str(user1.get_turn_result()), text_font, black, screen_width // 2 - 250, 100)
