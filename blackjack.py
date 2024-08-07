@@ -69,9 +69,19 @@ class Deck:
         """Takes a list of cards and shuffles them."""
         return random.shuffle(self._cards)
 
-    def draw_card(self):
-        """Draws a card and removes it from the deck"""
-        return self._cards.pop()
+    def draw_card(self, is_face_up):
+        """Draws a card and removes it from the deck, defaults to face up card"""
+        drawn_card = self._cards.pop()
+        drawn_card.set_face_up(is_face_up)
+        return drawn_card
+
+    def add_card_to_deck(self, card_to_add):
+        """Adds cards to the deck"""
+        self._cards.append(card_to_add)
+
+    def get_deck_size(self):
+        """Returns the current size of the deck"""
+        return len(self._cards)
 
 
 class User:
@@ -85,11 +95,11 @@ class User:
         self._score = 0
         self._turn_result = 'in-progress'
 
-    def draw_user_card(self, game_deck, number_of_cards):
+    def draw_user_card(self, game_deck, number_of_cards, is_face_up=True):
         """Adds a specified number of cards to the user's hand from the deck. Make sure the deck is shuffled."""
         i = 0
         while i < number_of_cards:
-            self._hand.append(game_deck.draw_card())
+            self._hand.append(game_deck.draw_card(is_face_up))
             i += 1
 
     def get_hand(self):
@@ -138,6 +148,13 @@ class User:
             readable_card_list.append(card.get_card())
         return readable_card_list
 
+    def clear_hand(self):
+        """Clears the user's hand, returns the cards to the deck, and shuffles the deck"""
+        for card in self._hand:
+            deck.add_card_to_deck(card)
+        deck.shuffle_deck()
+        self._hand = []
+
 
 user1 = User("jacob")
 deck = Deck()
@@ -149,34 +166,58 @@ blackjack = 21
 
 
 def draw_cards_button_func():
-    user1.draw_user_card(deck, 2)
-    dealer.draw_user_card(deck, 2)
+    user1.draw_user_card(deck, 2, True)
+    dealer.draw_user_card(deck, 1, True)
+    dealer.draw_user_card(deck, 1, False)
     dealer_hand = dealer.get_hand()
-    dealer_hand[1].set_face_up(False)
+    initial_score_check()
 
 
 def check_dealer_score():
-    """if dealer.get_hand_value() < 16:
-        dealer.draw_user_card(deck, 1)
-        print("Drawing card")"""
     if dealer.get_hand_value() > 17:
         for card in dealer.get_hand():
             card.set_face_up(True)
 
 
 def hit():
-    user1.draw_user_card(deck, 1)
-    if dealer.get_hand_value() < 17:
-        dealer.draw_user_card()
+    user1.draw_user_card(deck, 1, True)
+    if user1.get_hand_value() > 21:
+        user1.set_turn_result('loss')
+        dealer.set_turn_result('win')
 
 
-def score_check():
+def stand():
+    dealer_hand = dealer.get_hand()
+    dealer_hand[1].set_face_up(True)
+    while dealer.get_hand_value() <= 16:
+        dealer.draw_user_card(deck, 1, True)
+    final_score_check()
+
+
+def initial_score_check():
+    if (dealer.get_hand_value() == 21 and user1.get_hand_value() != 21  # Dealer gets 21 and player does not
+            or user1.get_hand_value() > 21):  # User busts
+        dealer.set_turn_result('win')
+        user1.set_turn_result('loss')
+    elif user1.get_hand_value() == 21 and dealer.get_hand_value() != 21:  # Player gets 21 and dealer does not
+        dealer.set_turn_result('loss')
+        user1.set_turn_result('win')
+
+
+def clear_table():
+    user1.set_turn_result('in-progress')
+    user1.clear_hand()
+    dealer.set_turn_result('in-progress')
+    dealer.clear_hand()
+
+
+def final_score_check():
     if ((user1.get_hand_value() == 21 and dealer.get_hand_value() != 21  # User blackjack
          or dealer.get_hand_value() < user1.get_hand_value() <= 21)  # Neither bust, user has higher hand
             or dealer.get_hand_value() > 21 >= user1.get_hand_value()):  # Dealer bust, user does not
         user1.set_turn_result('win')
         dealer.set_turn_result('loss')
-    elif (user1.get_hand_value() > 21 >= dealer.get_hand_value()  # User bust, dealer does not
+    elif (user1.get_hand_value() > 21  # User bust
           or user1.get_hand_value() < dealer.get_hand_value() <= 21):  # Neither bust, dealer has higher hand
         user1.set_turn_result('loss')
         dealer.set_turn_result('win')
@@ -214,6 +255,32 @@ hit_button = Button(
     onClick=hit
 )
 
+stand_button = Button(
+    screen,
+    screen_width // 2 + 500,  # X coordinate of the top-left corner
+    400,  # Y coordinate of the top-left corner
+    75,
+    25,
+    text='Stand',
+    fontSize=20, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    onClick=stand
+)
+
+clear_button = Button(  # TEMPORARY BUTTON
+    screen,
+    screen_width // 2 - 500,  # X coordinate of the top-left corner
+    400,  # Y coordinate of the top-left corner
+    75,
+    25,
+    text='Clear',
+    fontSize=20, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    onClick=clear_table
+)
+
 white = (255, 255, 255)
 blue = (0, 0, 128)
 
@@ -234,8 +301,8 @@ while running:
     # Game code here
     screen.fill("black")
 
-    draw_text("Your cards are: ", text_font, white, screen_width//2 - 25, 550)
-    draw_text(str(user1.show_hand()), text_font, white, screen_width//2 - 25, 600)
+    draw_text("Your cards are: ", text_font, white, screen_width // 2 - 25, 550)
+    draw_text(str(user1.show_hand()), text_font, white, screen_width // 2 - 25, 600)
 
     draw_text("Your score: ", text_font, white, screen_width // 2 + 250, 550)
     draw_text(str(user1.get_hand_value()), text_font, white, screen_width // 2 + 350, 550)
@@ -246,15 +313,23 @@ while running:
     draw_text("Dealer's score: ", text_font, white, screen_width // 2 + 250, 100)
     draw_text(str(dealer.get_hand_value()), text_font, white, screen_width // 2 + 350, 100)
 
+    draw_text("Turn result: ", text_font, white, screen_width // 2 - 350, 100)
+    draw_text(str(user1.get_turn_result()), text_font, white, screen_width // 2 - 250, 100)
+
+    draw_text("Cards in deck: ", text_font, white, screen_width // 2 - 350, 300)
+    draw_text(str(deck.get_deck_size()), text_font, white, screen_width // 2 - 250, 300)
+
     deal_cards_button.draw()
     hit_button.draw()
+    stand_button.draw()
+    clear_button.draw()
 
     pygame.display.flip()
     pygame.display.update()
 
-    check_dealer_score()
+    # check_dealer_score()
 
     pw.update(events)
-    clock.tick(60)
+    clock.tick(30)
 
 pygame.quit()
