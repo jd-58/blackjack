@@ -107,13 +107,14 @@ class Deck:
 class User:
     """Creates a user"""
 
-    def __init__(self, username):
+    def __init__(self, username, bankroll=0):
         """Initializes a user object with a given username and empty hand"""
         self._username = username
         self._hand = []
         self._bankroll = 1000
         self._score = 0
         self._turn_result = 'in-progress'
+        self._bankroll = bankroll
 
     def draw_user_card(self, game_deck, number_of_cards, is_face_up=True):
         """Adds a specified number of cards to the user's hand from the deck. Make sure the deck is shuffled."""
@@ -141,6 +142,10 @@ class User:
             current_value += card.get_value()
         return current_value
 
+    def get_bankroll(self):
+        """Returns the user's bankroll"""
+        return self._bankroll
+
     def get_username(self):
         """Returns the user's current username"""
         return self._username
@@ -152,6 +157,10 @@ class User:
     def set_turn_result(self, new_turn_result):
         """Changes the user's current turn result"""
         self._turn_result = new_turn_result
+
+    def set_bankroll(self, amount_to_add):
+        """Changes the user's bankroll by the desired amount. A negative number lowers the bankroll"""
+        self._bankroll += amount_to_add
 
     def set_score(self, new_score):
         """Changes the user's score"""
@@ -232,6 +241,13 @@ def clear_table():
     dealer.clear_hand()
 
 
+def turn_over_check():
+    if user1.get_turn_result() != 'in-progress' and dealer.get_turn_result() != 'in-progress':
+        dealer_hand = dealer.get_hand()
+        for card in dealer_hand:
+            card.set_face_up(True)
+
+
 def final_score_check():
     if ((user1.get_hand_value() == 21 and dealer.get_hand_value() != 21  # User blackjack
          or dealer.get_hand_value() < user1.get_hand_value() <= 21)  # Neither bust, user has higher hand
@@ -304,6 +320,7 @@ clear_button = Button(  # TEMPORARY BUTTON
 
 white = (255, 255, 255)
 blue = (0, 0, 128)
+black = (0, 0, 0)
 
 text_font = pygame.font.SysFont("Arial", 18)
 
@@ -320,25 +337,28 @@ while running:
             running = False
 
     # Game code here
-    screen.fill("black")
+    screen.fill("green")
 
-    draw_text("Your cards are: ", text_font, white, screen_width // 2 - 25, 550)
-    draw_text(str(user1.show_hand()), text_font, white, screen_width // 2 - 25, 600)
+    draw_text("Your cards are: ", text_font, black, screen_width // 2 - 25, 550)
+    draw_text(str(user1.show_hand()), text_font, black, screen_width // 2 - 25, 600)
 
-    draw_text("Your score: ", text_font, white, screen_width // 2 + 250, 550)
-    draw_text(str(user1.get_hand_value()), text_font, white, screen_width // 2 + 350, 550)
+    draw_text("Your score: ", text_font, black, screen_width // 2 + 250, 550)
+    draw_text(str(user1.get_hand_value()), text_font, black, screen_width // 2 + 350, 550)
 
-    draw_text("Dealer's cards are: ", text_font, (255, 255, 255), screen_width // 2 - 25, 100)
-    draw_text(str(dealer.show_hand()), text_font, (255, 255, 255), screen_width // 2 - 25, 150)
+    draw_text("Chips: ", text_font, black, screen_width // 2 + 450, 550)
+    draw_text(str(user1.get_bankroll()), text_font, black, screen_width // 2 + 500, 550)
 
-    # draw_text("Dealer's score: ", text_font, white, screen_width // 2 + 250, 100)
-    # draw_text(str(dealer.get_hand_value()), text_font, white, screen_width // 2 + 350, 100)
+    draw_text("Dealer's cards are: ", text_font, black, screen_width // 2 - 25, 100)
+    draw_text(str(dealer.show_hand()), text_font, black, screen_width // 2 - 25, 150)
 
-    draw_text("Turn result: ", text_font, white, screen_width // 2 - 350, 100)
-    draw_text(str(user1.get_turn_result()), text_font, white, screen_width // 2 - 250, 100)
+    # draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
+    # draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
 
-    draw_text("Cards in deck: ", text_font, white, screen_width // 2 - 350, 300)
-    draw_text(str(deck.get_deck_size()), text_font, white, screen_width // 2 - 250, 300)
+    draw_text("Turn result: ", text_font, black, screen_width // 2 - 350, 100)
+    draw_text(str(user1.get_turn_result()), text_font, black, screen_width // 2 - 250, 100)
+
+    draw_text("Cards in deck: ", text_font, black, screen_width // 2 - 350, 300)
+    draw_text(str(deck.get_deck_size()), text_font, black, screen_width // 2 - 250, 300)
 
     deal_cards_button.draw()
     hit_button.draw()
@@ -349,6 +369,7 @@ while running:
     pygame.display.update()
 
     # check_dealer_score()
+    turn_over_check()
 
     pw.update(events)
     clock.tick(30)
