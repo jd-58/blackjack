@@ -9,11 +9,8 @@ import pygame.freetype
 
 # To try and embedd my game in browser: https://pygame-web.github.io/#demos-on-itchio
 
-# TO-DO: if dealer gets an ace, and it switches to 1, I have to hit the stand button twice to get the turn to
-# count as a win. look into adding a function for ace checking and score updating.
-# ACTUALLY THIS DOESN'T ALWAYS HAPPEN. IDK WHY
-# If the user gets an ace, and its value is changed to a 1, busts are not correctly calculated. Try adding a function
-# for changing the ace value to clean up the logic, and might need to update score checking logic as well.
+# TO-DO: add chip betting
+# TO-DO: add automatic table clearing after a turn is over
 
 class Card:
     """Creates a card object"""
