@@ -1,4 +1,5 @@
 import pygame
+import math
 import pygame_widgets as pw
 from pygame_widgets.button import Button
 from pygame_widgets.textbox import TextBox
@@ -9,8 +10,8 @@ import pygame.freetype
 
 # To try and embedd my game in browser: https://pygame-web.github.io/#demos-on-itchio
 
-# TO-DO: add chip betting
-# TO-DO: add automatic table clearing after a turn is over
+# TO-DO: add splitting, insurance, and doubling down
+
 
 class Card:
     """Creates a card object"""
@@ -362,7 +363,7 @@ def initial_score_check():
         user1.set_turn_result('loss')
     elif user1.get_hand_value() == 21 and dealer.get_hand_value() != 21:  # Player gets natural 21 and dealer does not
         dealer.set_turn_result('loss')
-        user1.set_turn_result('blackjack!')
+        user1.set_turn_result('blackjack')
     elif user1.get_hand_value() == 21 and dealer.get_hand_value() == 21:  # Both player and dealer get natural 21
         dealer.set_turn_result('push')
         user1.set_turn_result('push')
@@ -482,7 +483,7 @@ def distribute_chips_from_pot():
         pot.set_bankroll(0)
         user1.set_amount_bet(0)
     elif user1.get_turn_result() == 'blackjack':
-        user1.update_bankroll(2.5 * user1.get_amount_bet())
+        user1.update_bankroll(math.floor(2.5 * user1.get_amount_bet()))
         pot.set_bankroll(0)
         user1.set_amount_bet(0)
     elif user1.get_turn_result() == 'push':
