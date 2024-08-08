@@ -271,12 +271,16 @@ def stand():
 
 
 def initial_score_check():
-    if user1.get_hand_value() > 21:  # User busts
+    if (user1.get_hand_value() > 21  # User busts
+            or dealer.get_hand_value() == 21 and user1.get_hand_value != 21):  # Dealer gets natural blackjack
         dealer.set_turn_result('win')
         user1.set_turn_result('loss')
-    elif user1.get_hand_value() == 21 and dealer.get_hand_value() != 21:  # Player gets 21 and dealer does not
+    elif user1.get_hand_value() == 21 and dealer.get_hand_value() != 21:  # Player gets natural 21 and dealer does not
         dealer.set_turn_result('loss')
         user1.set_turn_result('win')
+    elif user1.get_hand_value() == 21 and dealer.get_hand_value() == 21:  # Both player and dealer get natural 21
+        dealer.set_turn_result('push')
+        user1.set_turn_result('push')
 
 
 def clear_table():
