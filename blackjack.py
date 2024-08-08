@@ -127,7 +127,7 @@ class Deck:
 class User:
     """Creates a user"""
 
-    def __init__(self, username, bankroll=0):
+    def __init__(self, username, bankroll=0, amount_bet=0):
         """Initializes a user object with a given username and empty hand"""
         self._username = username
         self._hand = []
@@ -135,6 +135,7 @@ class User:
         self._score = 0
         self._turn_result = 'in-progress'
         self._bankroll = bankroll
+        self._amount_bet = amount_bet
 
     def draw_user_card(self, game_deck, number_of_cards, is_face_up=True):
         """Adds a specified number of cards to the user's hand from the deck. Make sure the deck is shuffled."""
@@ -150,6 +151,10 @@ class User:
     def get_turn_result(self):
         """Returns win if the user has won the hand, or loss if they have not"""
         return self._turn_result
+
+    def get_amount_bet(self):
+        """Returns the amount the player has bet during the current hand."""
+        return self._amount_bet
 
     def get_score(self):
         """Returns the user's current score"""
@@ -178,17 +183,29 @@ class User:
         """Changes the user's hand. For testing purposes"""
         self._hand = specified_hand
 
+    def update_amount_bet(self, amount_bet):
+        """Updates the amount the user has bet during the current hand."""
+        self._amount_bet += amount_bet
+
     def set_turn_result(self, new_turn_result):
         """Changes the user's current turn result"""
         self._turn_result = new_turn_result
 
-    def set_bankroll(self, amount_to_add):
+    def update_bankroll(self, amount_to_add):
         """Changes the user's bankroll by the desired amount. A negative number lowers the bankroll"""
         self._bankroll += amount_to_add
+
+    def set_bankroll(self, new_amount):
+        """Changes the user's bankroll to a specific amount."""
+        self._bankroll = new_amount
 
     def set_score(self, new_score):
         """Changes the user's score"""
         self._score = new_score
+
+    def set_amount_bet(self, new_amount):
+        """Changes the amount a user has bet during the current hand to a specified amount."""
+        self._amount_bet = new_amount
 
     def update_score(self):
         """Updates the user's score to reflect their current hand"""
@@ -208,10 +225,59 @@ class User:
         deck.shuffle_deck()
         self._hand = []
 
+    @property
+    def amount_bet(self):
+        return self._amount_bet
+
 
 user1 = User("jacob", 1000)
 deck = Deck()
 deck.shuffle_deck()
+pot = User("pot", 0)
+
+
+#  Need separate functions for each bet, since functions assigned to a button in pygame can't have parameters.
+def user_bet_one():
+    """Takes 1 chip out of the user's bankroll and adds it to the pot"""
+    user1.update_bankroll(-1)
+    user1.update_amount_bet(1)
+    pot.update_bankroll(1)
+
+
+def user_bet_five():
+    """Takes 5 chips out of the user's bankroll and adds it to the pot"""
+    user1.update_bankroll(-5)
+    user1.update_amount_bet(5)
+    pot.update_bankroll(5)
+
+
+def user_bet_twenty_five():
+    """Takes 25 chips out of the user's bankroll and adds it to the pot"""
+    user1.update_bankroll(-25)
+    user1.update_amount_bet(25)
+    pot.update_bankroll(25)
+
+
+def user_bet_one_hundred():
+    """Takes 100 chips out of the user's bankroll and adds it to the pot"""
+    user1.update_bankroll(-100)
+    user1.update_amount_bet(100)
+    pot.update_bankroll(100)
+
+
+def user_bet_five_hundred():
+    """Takes 500 chips out of the user's bankroll and adds it to the pot"""
+    user1.update_bankroll(-500)
+    user1.update_amount_bet(500)
+    pot.update_bankroll(500)
+
+
+def user_bet_one_thousand():
+    """Takes 1000 chips out of the user's bankroll and adds it to the pot"""
+    user1.update_bankroll(-1000)
+    user1.update_amount_bet(1000)
+    pot.update_bankroll(1000)
+
 
 dealer = User("Dealer")
 
@@ -274,7 +340,7 @@ def initial_score_check():
         user1.set_turn_result('loss')
     elif user1.get_hand_value() == 21 and dealer.get_hand_value() != 21:  # Player gets natural 21 and dealer does not
         dealer.set_turn_result('loss')
-        user1.set_turn_result('win')
+        user1.set_turn_result('blackjack!')
     elif user1.get_hand_value() == 21 and dealer.get_hand_value() == 21:  # Both player and dealer get natural 21
         dealer.set_turn_result('push')
         user1.set_turn_result('push')
@@ -315,6 +381,9 @@ def turn_over_check():
         dealer_hand = dealer.get_hand()
         for card in dealer_hand:
             card.set_face_up(True)
+        distribute_chips_from_pot()
+        # clear_table() - need to add a pop up window that displays the result, and only moves to the next hand after
+        # the user acknowledges it. currently, it moves too quick for the user to know what happened.
 
 
 def change_ace_value_to_11(user):
@@ -368,8 +437,10 @@ def final_score_check():
         user1.set_turn_result('push')
         dealer.set_turn_result('push')
         return
-    elif ((user1.get_hand_value() == 21 and dealer.get_hand_value() != 21  # User blackjack
-           or dealer.get_hand_value() < user1.get_hand_value() <= 21)  # Neither bust, user has higher hand
+    elif user1.get_hand_value() == 21 and dealer.get_hand_value() != 21:  # User blackjack
+        user1.set_turn_result('blackjack')
+        dealer.set_turn_result('loss')
+    elif (dealer.get_hand_value() < user1.get_hand_value() <= 21  # Neither bust, user has higher hand
           or dealer.get_hand_value() > 21 >= user1.get_hand_value()):  # Dealer bust, user does not
         user1.set_turn_result('win')
         dealer.set_turn_result('loss')
@@ -381,6 +452,20 @@ def final_score_check():
         dealer.set_turn_result('win')
         return
     return
+
+
+def distribute_chips_from_pot():
+    if user1.get_turn_result() == 'win':
+        user1.update_bankroll(2 * user1.get_amount_bet())
+        pot.set_bankroll(0)
+        user1.set_amount_bet(0)
+    elif user1.get_turn_result() == 'blackjack':
+        user1.update_bankroll(2.5 * user1.get_amount_bet())
+        pot.set_bankroll(0)
+        user1.set_amount_bet(0)
+    elif user1.get_turn_result() == 'loss':
+        pot.set_bankroll(0)
+        user1.set_amount_bet(0)
 
 
 pygame.init()
@@ -439,7 +524,7 @@ one_dollar_chip = Button(
     fontSize=10, margin=20,
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
-    onClick=hit
+    onClick=user_bet_one
 )
 
 five_dollar_chip = Button(
@@ -452,7 +537,7 @@ five_dollar_chip = Button(
     fontSize=10, margin=20,
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
-    onClick=hit
+    onClick=user_bet_five
 )
 
 twenty_five_dollar_chip = Button(
@@ -465,7 +550,7 @@ twenty_five_dollar_chip = Button(
     fontSize=10, margin=20,
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
-    onClick=hit
+    onClick=user_bet_twenty_five
 )
 
 one_hundred_dollar_chip = Button(
@@ -474,11 +559,11 @@ one_hundred_dollar_chip = Button(
     650,  # Y coordinate of the top-left corner
     25,
     25,
-    text='25',
+    text='100',
     fontSize=10, margin=20,
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
-    onClick=hit
+    onClick=user_bet_one_hundred
 )
 
 five_hundred_dollar_chip = Button(
@@ -491,7 +576,7 @@ five_hundred_dollar_chip = Button(
     fontSize=10, margin=20,
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
-    onClick=hit
+    onClick=user_bet_five_hundred
 )
 
 one_thousand_dollar_chip = Button(
@@ -504,9 +589,8 @@ one_thousand_dollar_chip = Button(
     fontSize=10, margin=20,
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
-    onClick=hit
+    onClick=user_bet_one_thousand
 )
-
 
 stand_button = Button(
     screen,
@@ -593,8 +677,11 @@ while running:
     draw_text("Dealer's cards are: ", text_font, black, screen_width // 2 - 25, 100)
     draw_text(str(dealer.show_hand()), text_font, black, screen_width // 2 - 25, 150)
 
-    # draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
-    # draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
+    draw_text("Pot: ", text_font, black, screen_width // 2 - 25, 300)
+    draw_text(str(pot.get_bankroll()), text_font, black, screen_width // 2 + 25, 300)
+
+    draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
+    draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
 
     draw_text("Turn result: ", text_font, black, screen_width // 2 - 350, 100)
     draw_text(str(user1.get_turn_result()), text_font, black, screen_width // 2 - 250, 100)
