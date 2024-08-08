@@ -292,12 +292,33 @@ def draw_cards_button_func():
     initial_score_check()
 
 
+"""def hit_specific_cards():
+    new_card = Card(11, 'ace', 'spades')
+    user_hand = user1.get_hand()
+    user_hand.append(new_card)
+    ace_needs_to_change = False
+    for card in user_hand:
+        if card.get_name() == 'ace' and card.get_has_value_changed() is False:
+            ace_needs_to_change = True
+    if user1.get_hand_value() > 21 and ace_needs_to_change is True:
+        for card in user1.get_hand():
+            if card.get_name() == 'ace':
+                if card.get_value() != 1:
+                    card.set_value(1)
+                    return
+    if user1.get_hand_value() > 21:
+        user1.set_turn_result('loss')
+        dealer.set_turn_result('win')"""
+
 def draw_specific_cards_button_func():  # This is for testing certain hand combinations and results
-    card1 = Card(4, '4', 'hearts', True)
-    card2 = Card(11, 'ace', 'diamonds', True)
-    new_hand = [card1, card2]
-    user1.draw_user_card(deck, 2, True)
-    dealer.set_hand(new_hand)
+    card1 = Card(7, '7', 'hearts', True)
+    card2 = Card(10, 'queen', 'diamonds', True)
+    new_hand1 = [card1, card2]
+    card3 = Card(11, 'ace', 'hearts', True)
+    card4 = Card(3, '3', 'hearts', True)
+    dealer.set_hand(new_hand1)
+    new_hand2 = [card3, card4]
+    user1.set_hand(new_hand2)
     initial_score_check()
 
 
@@ -310,15 +331,16 @@ def check_dealer_score():
 def hit():
     user1.draw_user_card(deck, 1, True)
     user_hand = user1.get_hand()
-    is_ace = False
+    ace_needs_to_change = False
     for card in user_hand:
-        if card.get_name() == 'ace':
-            is_ace = True
-    if user1.get_hand_value() > 21 and is_ace is True:
+        if card.get_name() == 'ace' and card.get_has_value_changed() is False:
+            ace_needs_to_change = True
+    if user1.get_hand_value() > 21 and ace_needs_to_change is True:
         for card in user1.get_hand():
             if card.get_name() == 'ace':
                 if card.get_value() != 1:
                     card.set_value(1)
+                    return
     if user1.get_hand_value() > 21:
         user1.set_turn_result('loss')
         dealer.set_turn_result('win')
@@ -518,6 +540,19 @@ hit_button = Button(
     onClick=hit
 )
 
+hit_specific_card_button = Button(
+    screen,
+    screen_width // 2 + 250,  # X coordinate of the top-left corner
+    400,  # Y coordinate of the top-left corner
+    75,
+    25,
+    text='Hit2',
+    fontSize=20, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    # onClick=hit_specific_cards
+)
+
 one_dollar_chip = Button(
     screen,
     screen_width // 2 + 250,  # X coordinate of the top-left corner
@@ -695,6 +730,7 @@ while running:
 
     deal_cards_button.draw()
     hit_button.draw()
+    # hit_specific_card_button.draw()
     stand_button.draw()
     clear_button.draw()
     # deal_specific_cards_button.draw()
