@@ -680,8 +680,8 @@ while running:
     draw_text("Pot: ", text_font, black, screen_width // 2 - 25, 300)
     draw_text(str(pot.get_bankroll()), text_font, black, screen_width // 2 + 25, 300)
 
-    draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
-    draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
+    # draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
+    # draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
 
     draw_text("Turn result: ", text_font, black, screen_width // 2 - 350, 100)
     draw_text(str(user1.get_turn_result()), text_font, black, screen_width // 2 - 250, 100)
