@@ -10,6 +10,7 @@ import pygame.freetype
 
 # To try and embedd my game in browser: https://pygame-web.github.io/#demos-on-itchio
 
+# TO-DO: make sure user cannot place a bet to take their bankroll below 0
 # TO-DO: add splitting, insurance, and doubling down
 
 
