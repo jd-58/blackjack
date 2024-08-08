@@ -260,10 +260,12 @@ def hit():
         user1.set_turn_result('loss')
         dealer.set_turn_result('win')
 
+
 def stand():
     dealer_hand = dealer.get_hand()
     dealer_hand[1].set_face_up(True)
     while dealer.get_hand_value() <= 16:
+        check_to_change_ace(dealer)
         dealer.draw_user_card(deck, 1, True)
     final_score_check()
 
@@ -343,8 +345,14 @@ def check_for_ace(user):
             return True
 
 
+def check_to_change_ace(user):
+    if user.get_hand_value() > 21 and check_for_ace(user) is True:
+        change_ace_value_to_1(user)
+        return
+
+
 def final_score_check():
-    if user1.get_hand_value() > 21:
+    """if user1.get_hand_value() > 21:
         if check_for_ace_to_change(user1) is True:
             change_ace_value_to_1(user1)
         else:
@@ -353,14 +361,14 @@ def final_score_check():
             return
     if dealer.get_hand_value() > 21:
         if check_for_ace_to_change(dealer) is True:
-            change_ace_value_to_1(dealer)
+            change_ace_value_to_1(dealer)"""
     if 21 >= user1.get_hand_value() == dealer.get_hand_value():
         #  If the user and dealer tie
         user1.set_turn_result('push')
         dealer.set_turn_result('push')
         return
     elif ((user1.get_hand_value() == 21 and dealer.get_hand_value() != 21  # User blackjack
-          or dealer.get_hand_value() < user1.get_hand_value() <= 21)  # Neither bust, user has higher hand
+           or dealer.get_hand_value() < user1.get_hand_value() <= 21)  # Neither bust, user has higher hand
           or dealer.get_hand_value() > 21 >= user1.get_hand_value()):  # Dealer bust, user does not
         user1.set_turn_result('win')
         dealer.set_turn_result('loss')
@@ -380,6 +388,7 @@ screen_height = 720
 screen = pygame.display.set_mode((screen_width, screen_height))
 clock = pygame.time.Clock()
 running = True
+
 deal_cards_button = Button(
     screen,
     screen_width // 2 - 50,  # X coordinate of the top-left corner
@@ -391,6 +400,19 @@ deal_cards_button = Button(
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
     onClick=draw_cards_button_func
+)
+
+deal_specific_cards_button = Button(  # For testing
+    screen,
+    screen_width // 2 - 250,  # X coordinate of the top-left corner
+    400,  # Y coordinate of the top-left corner
+    200,
+    25,
+    text='Draw Specific cards',
+    fontSize=20, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    onClick=draw_specific_cards_button_func
 )
 
 hit_button = Button(
@@ -504,7 +526,7 @@ while running:
     hit_button.draw()
     stand_button.draw()
     clear_button.draw()
-
+    # deal_specific_cards_button.draw()
 
     pygame.display.flip()
     pygame.display.update()
