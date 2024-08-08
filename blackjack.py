@@ -12,11 +12,13 @@ import pygame.freetype
 # TO-DO: if dealer gets an ace, and it switches to 1, I have to hit the stand button twice to get the turn to
 # count as a win. look into adding a function for ace checking and score updating.
 # ACTUALLY THIS DOESN'T ALWAYS HAPPEN. IDK WHY
+# If the user gets an ace, and its value is changed to a 1, busts are not correctly calculated. Try adding a function
+# for changing the ace value to clean up the logic, and might need to update score checking logic as well.
 
 class Card:
     """Creates a card object"""
 
-    def __init__(self, value, name, suit, face_up=True):
+    def __init__(self, value, name, suit, face_up=True, has_value_changed=False):
         """Initializes a card object with a value and a suit/"""
         self._value = value
         self._suit = suit
@@ -24,6 +26,7 @@ class Card:
         self._face_up = face_up
         self._name = str(name)
         self._name_and_suit = str(name) + " " + str(self._suit)
+        self._has_value_changed = has_value_changed
 
     def get_card(self):
         """Returns the string card value and then suit"""
@@ -35,6 +38,10 @@ class Card:
     def get_face_up(self):
         """Returns a true value (default) if a card should be face up, and false if it should be face down"""
         return self._face_up
+
+    def get_has_value_changed(self):
+        """Returns if a card (an ace) has had its value changed this turn."""
+        return self._has_value_changed
 
     def get_name(self):
         """Returns a card's name if it is face up"""
@@ -61,6 +68,10 @@ class Card:
     def set_face_up(self, face_up_value):
         """Sets a card's face up value. True if face up, False if face down."""
         self._face_up = face_up_value
+
+    def set_has_value_changed(self, new_value):
+        """Changes whether a card's value has changed this turn"""
+        self._has_value_changed = new_value
 
     def set_name(self, new_name):
         """Sets a card's display name"""
@@ -235,16 +246,19 @@ def check_dealer_score():
 
 def hit():
     user1.draw_user_card(deck, 1, True)
-    user_han = user1.get_hand()
+    user_hand = user1.get_hand()
     is_ace = False
-    if user1.get_hand_value() > 21:
+    for card in user_hand:
+        if card.get_name() == 'ace':
+            is_ace = True
+    if user1.get_hand_value() > 21 and is_ace is True:
         for card in user1.get_hand():
             if card.get_name() == 'ace':
-                card.set_value(1)
-                return
+                if card.get_value() != 1:
+                    card.set_value(1)
+    if user1.get_hand_value() > 21:
         user1.set_turn_result('loss')
         dealer.set_turn_result('win')
-
 
 def stand():
     dealer_hand = dealer.get_hand()
@@ -264,18 +278,14 @@ def initial_score_check():
 
 
 def clear_table():
+    if check_for_ace(user1) is True:
+        change_ace_value_to_11(user1)
+    if check_for_ace(dealer) is True:
+        change_ace_value_to_11(dealer)
     user1.set_turn_result('in-progress')
     user1.clear_hand()
     dealer.set_turn_result('in-progress')
     dealer.clear_hand()
-
-
-def check_for_user_ace():
-    user_hand = user1.get_hand()
-    for card in user_hand:
-        if card.get_value() == 11:
-            return True
-    return False
 
 
 def set_ace_to_1():
@@ -304,34 +314,63 @@ def turn_over_check():
             card.set_face_up(True)
 
 
+def change_ace_value_to_11(user):
+    user_hand = user.get_hand()
+    for card in user_hand:
+        if card.get_name() == 'ace':
+            card.set_has_value_changed(False)
+            card.set_value(11)
+
+
+def change_ace_value_to_1(user):
+    user_hand = user.get_hand()
+    for card in user_hand:
+        if card.get_name() == 'ace':
+            card.set_value(1)
+
+
+def check_for_ace_to_change(user):
+    user_hand = user.get_hand()
+    for card in user_hand:
+        if card.get_name() == 'ace' and card.get_value() == 11:
+            return True
+
+
+def check_for_ace(user):
+    user_hand = user.get_hand()
+    for card in user_hand:
+        if card.get_name() == 'ace':
+            return True
+
+
 def final_score_check():
     if user1.get_hand_value() > 21:
-        for card in user1.get_hand():
-            if card.get_name() == 'ace':
-                card.set_value(1)
-                return
+        if check_for_ace_to_change(user1) is True:
+            change_ace_value_to_1(user1)
+        else:
+            user1.set_turn_result('loss')
+            dealer.set_turn_result('win')
+            return
     if dealer.get_hand_value() > 21:
-        for card in dealer.get_hand():
-            if card.get_name() == 'ace':
-                card.set_value(1)
+        if check_for_ace_to_change(dealer) is True:
+            change_ace_value_to_1(dealer)
     if 21 >= user1.get_hand_value() == dealer.get_hand_value():
         #  If the user and dealer tie
-        print('tie')
         user1.set_turn_result('push')
         dealer.set_turn_result('push')
+        return
     elif ((user1.get_hand_value() == 21 and dealer.get_hand_value() != 21  # User blackjack
           or dealer.get_hand_value() < user1.get_hand_value() <= 21)  # Neither bust, user has higher hand
           or dealer.get_hand_value() > 21 >= user1.get_hand_value()):  # Dealer bust, user does not
         user1.set_turn_result('win')
         dealer.set_turn_result('loss')
-        print("user win")
+        return
     elif (user1.get_hand_value() > 21  # User bust
           or user1.get_hand_value() < dealer.get_hand_value() <= 21  # Neither bust, dealer has higher hand
           or dealer.get_hand_value() == 21):  # Dealer blackjack
         user1.set_turn_result('loss')
         dealer.set_turn_result('win')
-        print("user lose")
-    print("no conditions apply")
+        return
     return
 
 
@@ -466,9 +505,6 @@ while running:
     stand_button.draw()
     clear_button.draw()
 
-    # if check_for_user_ace() is True:
-    ace_choice_button_1.draw()
-    ace_choice_button_11.draw()
 
     pygame.display.flip()
     pygame.display.update()
