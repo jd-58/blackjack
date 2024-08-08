@@ -209,7 +209,7 @@ class User:
         self._hand = []
 
 
-user1 = User("jacob")
+user1 = User("jacob", 1000)
 deck = Deck()
 deck.shuffle_deck()
 
@@ -429,6 +429,85 @@ hit_button = Button(
     onClick=hit
 )
 
+one_dollar_chip = Button(
+    screen,
+    screen_width // 2 + 250,  # X coordinate of the top-left corner
+    650,  # Y coordinate of the top-left corner
+    25,
+    25,
+    text='1',
+    fontSize=10, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    onClick=hit
+)
+
+five_dollar_chip = Button(
+    screen,
+    screen_width // 2 + 300,  # X coordinate of the top-left corner
+    650,  # Y coordinate of the top-left corner
+    25,
+    25,
+    text='5',
+    fontSize=10, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    onClick=hit
+)
+
+twenty_five_dollar_chip = Button(
+    screen,
+    screen_width // 2 + 350,  # X coordinate of the top-left corner
+    650,  # Y coordinate of the top-left corner
+    25,
+    25,
+    text='25',
+    fontSize=10, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    onClick=hit
+)
+
+one_hundred_dollar_chip = Button(
+    screen,
+    screen_width // 2 + 400,  # X coordinate of the top-left corner
+    650,  # Y coordinate of the top-left corner
+    25,
+    25,
+    text='25',
+    fontSize=10, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    onClick=hit
+)
+
+five_hundred_dollar_chip = Button(
+    screen,
+    screen_width // 2 + 450,  # X coordinate of the top-left corner
+    650,  # Y coordinate of the top-left corner
+    25,
+    25,
+    text='500',
+    fontSize=10, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    onClick=hit
+)
+
+one_thousand_dollar_chip = Button(
+    screen,
+    screen_width // 2 + 500,  # X coordinate of the top-left corner
+    650,  # Y coordinate of the top-left corner
+    25,
+    25,
+    text='1000',
+    fontSize=10, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    onClick=hit
+)
+
+
 stand_button = Button(
     screen,
     screen_width // 2 + 500,  # X coordinate of the top-left corner
@@ -455,7 +534,7 @@ clear_button = Button(  # TEMPORARY BUTTON
     onClick=clear_table
 )
 
-ace_choice_button_1 = Button(
+"""ace_choice_button_1 = Button(
     screen,
     screen_width // 2 - 600,  # X coordinate of the top-left corner
     600,  # Y coordinate of the top-left corner
@@ -479,7 +558,7 @@ ace_choice_button_11 = Button(
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
     onClick=set_ace_to_11
-)
+)"""
 
 white = (255, 255, 255)
 blue = (0, 0, 128)
@@ -528,6 +607,12 @@ while running:
     stand_button.draw()
     clear_button.draw()
     # deal_specific_cards_button.draw()
+    one_dollar_chip.draw()
+    five_dollar_chip.draw()
+    twenty_five_dollar_chip.draw()
+    one_hundred_dollar_chip.draw()
+    five_hundred_dollar_chip.draw()
+    one_thousand_dollar_chip.draw()
 
     pygame.display.flip()
     pygame.display.update()
