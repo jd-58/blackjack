@@ -463,6 +463,10 @@ def distribute_chips_from_pot():
         user1.update_bankroll(2.5 * user1.get_amount_bet())
         pot.set_bankroll(0)
         user1.set_amount_bet(0)
+    elif user1.get_turn_result() == 'push':
+        user1.update_bankroll(user1.get_amount_bet())
+        pot.set_bankroll(0)
+        user1.set_amount_bet(0)
     elif user1.get_turn_result() == 'loss':
         pot.set_bankroll(0)
         user1.set_amount_bet(0)
