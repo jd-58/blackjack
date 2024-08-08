@@ -293,10 +293,10 @@ def draw_cards_button_func():
 
 
 def draw_specific_cards_button_func():  # This is for testing certain hand combinations and results
-    card1 = Card(11, 'ace', 'hearts', True)
-    card2 = Card(9, '9', 'diamonds', True)
+    card1 = Card(4, '4', 'hearts', True)
+    card2 = Card(11, 'ace', 'diamonds', True)
     new_hand = [card1, card2]
-    user1.set_hand(new_hand)
+    user1.draw_user_card(deck, 2, True)
     dealer.set_hand(new_hand)
     initial_score_check()
 
@@ -328,8 +328,8 @@ def stand():
     dealer_hand = dealer.get_hand()
     dealer_hand[1].set_face_up(True)
     while dealer.get_hand_value() <= 16:
-        check_to_change_ace(dealer)
         dealer.draw_user_card(deck, 1, True)
+        check_to_change_ace(dealer)
     final_score_check()
 
 
@@ -693,7 +693,7 @@ while running:
     hit_button.draw()
     stand_button.draw()
     clear_button.draw()
-    # deal_specific_cards_button.draw()
+    deal_specific_cards_button.draw()
     one_dollar_chip.draw()
     five_dollar_chip.draw()
     twenty_five_dollar_chip.draw()
