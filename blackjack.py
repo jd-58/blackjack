@@ -693,7 +693,7 @@ while running:
     hit_button.draw()
     stand_button.draw()
     clear_button.draw()
-    deal_specific_cards_button.draw()
+    # deal_specific_cards_button.draw()
     one_dollar_chip.draw()
     five_dollar_chip.draw()
     twenty_five_dollar_chip.draw()
