@@ -11,7 +11,10 @@ import pygame.freetype
 # To try and embedd my game in browser: https://pygame-web.github.io/#demos-on-itchio
 
 # TO-DO: make sure user cannot place a bet to take their bankroll below 0
-# TO-DO: add splitting, insurance, and doubling down
+# TO-DO: final check on splitting. if a user has already split, and they are back on their original hand, make sure the
+# resulting split results in a new split hand (if one is available) is created. right now the card gets added to split
+# hand number 1, which is supposed to be finished.
+# add insurance.
 
 
 class Card:
@@ -505,8 +508,8 @@ def draw_cards_button_func():
     split_check()
 
 
-"""def hit_specific_cards():
-    new_card = Card(11, 'ace', 'spades')
+def hit_specific_cards():
+    new_card = Card(7, '7', 'spades')
     user_hand = user1.get_hand()
     user_hand.append(new_card)
     ace_needs_to_change = False
@@ -521,7 +524,8 @@ def draw_cards_button_func():
                     return
     if user1.get_hand_value() > 21:
         user1.set_turn_result('loss')
-        dealer.set_turn_result('win')"""
+        dealer.set_turn_result('win')
+    is_double_down_possible()
 
 
 def split_check():
@@ -756,6 +760,7 @@ def stand():
 
 
 def initial_score_check():
+    check_to_change_ace(user1)
     if (user1.get_hand_value() > 21  # User busts
             or dealer.get_hand_value() == 21 and user1.get_hand_value != 21):  # Dealer gets natural blackjack
         dealer.set_turn_result('win')
@@ -1087,7 +1092,7 @@ hit_specific_card_button = Button(
     fontSize=20, margin=20,
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
-    # onClick=hit_specific_cards
+    onClick=hit_specific_cards
 )
 
 one_dollar_chip = Button(
@@ -1288,6 +1293,26 @@ while running:
         draw_text("Split hand result: ", text_font, black, screen_width // 2 + 250, 100)
         draw_text(str(user1.get_split_hand_result()), text_font, black, screen_width // 2 + 400, 100)
 
+    if user1.get_split_hand_2_result() is not None:
+        draw_text("Your 2nd split cards are: ", text_font, black, screen_width // 2 - 325, 550)
+        draw_text(str(user1.show_split_hand_2()), text_font, black, screen_width // 2 - 325, 600)
+
+        draw_text("Your 2nd split score: ", text_font, black, screen_width // 2 + 250, 525)
+        draw_text(str(user1.get_split_hand_2_value()), text_font, black, screen_width // 2 + 350, 525)
+
+        draw_text("Split hand 2 result: ", text_font, black, screen_width // 2 + 250, 100)
+        draw_text(str(user1.get_split_hand_result()), text_font, black, screen_width // 2 + 400, 100)
+
+    if user1.get_split_hand_3_result() is not None:
+        draw_text("Your 3rd split cards are: ", text_font, black, screen_width // 2 - 325, 550)
+        draw_text(str(user1.show_split_hand_3()), text_font, black, screen_width // 2 - 325, 600)
+
+        draw_text("Your 3rd split score: ", text_font, black, screen_width // 2 + 250, 525)
+        draw_text(str(user1.get_split_hand_3_value()), text_font, black, screen_width // 2 + 350, 525)
+
+        draw_text("Split hand 3 result: ", text_font, black, screen_width // 2 + 250, 100)
+        draw_text(str(user1.get_split_hand_3_result()), text_font, black, screen_width // 2 + 400, 100)
+
     deal_cards_button.draw()
     hit_button.draw()
     # hit_specific_card_button.draw()
@@ -1305,7 +1330,7 @@ while running:
     if is_double_down_possible() is True:
         double_down_button.draw()
 
-    if split_check() is True:
+    if split_check() or split_check_2() or split_check_3() or split_check_4() is True:
         split_button.draw()
 
     pygame.display.flip()
