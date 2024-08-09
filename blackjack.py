@@ -134,14 +134,22 @@ class User:
         self._username = username
         self._hand = []
         self._split_hand = []
+        self._split_hand2 = []
+        self._split_hand3 = []
         self._bankroll = 1000
         self._score = 0
         self._turn_result = 'in-progress'
         self._bankroll = bankroll
         self._amount_bet = amount_bet
         self._amount_bet_on_split = 0
+        self._amount_bet_on_split_2 = 0
+        self._amount_bet_on_split_3 = 0
         self._is_split_hand_active = False
+        self._is_split_hand_2_active = False
+        self._is_split_hand_3_active = False
         self._split_hand_result = None
+        self._split_hand_2_result = None
+        self._split_hand_3_result = None
 
     def draw_user_card(self, game_deck, number_of_cards, is_face_up=True):
         """Adds a specified number of cards to the user's hand from the deck."""
@@ -167,9 +175,25 @@ class User:
         """Returns the result of the current split hand. Is None if a split hand is not active"""
         return self._split_hand_result
 
+    def get_split_hand_2_result(self):
+        """Returns the result of the 2nd split hand. Is None if a split hand is not active"""
+        return self._split_hand_2_result
+
+    def get_split_hand_3_result(self):
+        """Returns the result of the 3rd split hand. Is None if a split hand is not active"""
+        return self._split_hand_3_result
+
     def get_is_split_hand_active(self):
         """Returns False if a split hand is not active, and True if it is"""
         return self._is_split_hand_active
+
+    def get_is_split_hand_2_active(self):
+        """Returns False if 2nd split hand is not active, and True if it is"""
+        return self._is_split_hand_2_active
+
+    def get_is_split_hand_3_active(self):
+        """Returns False if a 3rd split hand is not active, True if it is"""
+        return self._is_split_hand_3_active
 
     def get_turn_result(self):
         """Returns win if the user has won the hand, or loss if they have not"""
@@ -221,6 +245,14 @@ class User:
         """Changes whether a split hand is active"""
         self._is_split_hand_active = new_condition
 
+    def set_is_split_hand_2_active(self, new_condition):
+        """Changes whether split hand 2 is active"""
+        self._is_split_hand_2_active = new_condition
+
+    def set_is_split_hand_3_active(self, new_condition):
+        """Changes whether split hand 3 is active"""
+        self._is_split_hand_3_active = new_condition
+
     def set_hand(self, specified_hand):
         """Changes the user's hand. For testing purposes"""
         self._hand = specified_hand
@@ -229,21 +261,61 @@ class User:
         """Updates the result/status of the current split hand"""
         self._split_hand_result = new_result
 
+    def set_split_hand_2_result(self, new_result):
+        """Updates the result/status of the split hand 2"""
+        self._split_hand_2_result = new_result
+
+    def set_split_hand_3_result(self, new_result):
+        """Updates the result/status of split hand 3"""
+        self._split_hand_3_result = new_result
+
     def update_split_hand(self, card_to_add):
         """Adds a card to the user's split hand"""
         self._split_hand.append(card_to_add)
+
+    def update_split_hand_2(self, card_to_add):
+        """Adds a card to the user's 2nd split hand"""
+        self._split_hand2.append(card_to_add)
+
+    def update_split_hand_3(self, card_to_add):
+        """Adds a card to the user's 2nd split hand"""
+        self._split_hand3.append(card_to_add)
 
     def set_split_hand(self, specified_hand):
         """Updates the user's split hand to the specified hand"""
         self._split_hand = specified_hand
 
+    def set_split_hand_2(self, specified_hand):
+        """Updates the user's 2nd split hand to the specified hand"""
+        self._split_hand2 = specified_hand
+
+    def set_split_hand_3(self, specified_hand):
+        """Updates the user's 3rd split hand to the specified hand"""
+        self._split_hand3 = specified_hand
+
     def update_amount_bet_on_split(self, amount_bet):
         """Updates the amount a user has bet on a split hand"""
         self._amount_bet_on_split += amount_bet
 
+    def update_amount_bet_on_split_2(self, amount_bet):
+        """Updates the amount a user has bet on 2nd split hand"""
+        self._amount_bet_on_split_2 += amount_bet
+
+    def update_amount_bet_on_split_3(self, amount_bet):
+        """Updates the amount a user has bet on 3rd split hand"""
+        self._amount_bet_on_split_3 += amount_bet
+
     def set_amount_bet_on_split(self, new_amount):
         """Sets the amount a user has bet on a split hand"""
         self._amount_bet_on_split = new_amount
+
+    def set_amount_bet_on_split_2(self, new_amount):
+        """Sets the amount a user has bet on 2nd split hand"""
+        self._amount_bet_on_split_2 = new_amount
+
+    def set_amount_bet_on_split_3(self, new_amount):
+        """Sets the amount a user has bet on 3rd split hand"""
+        self._amount_bet_on_split_3 = new_amount
 
     def update_amount_bet(self, amount_bet):
         """Updates the amount the user has bet during the current hand."""
@@ -287,15 +359,35 @@ class User:
             readable_card_list.append(card.get_name_and_suit())
         return readable_card_list
 
+    def show_split_hand_2(self):
+        """Returns the user's split hand with the value and suit in string form"""
+        readable_card_list = []
+        for card in self._split_hand2:
+            readable_card_list.append(card.get_name_and_suit())
+        return readable_card_list
+
+    def show_split_hand_3(self):
+        """Returns the user's split hand with the value and suit in string form"""
+        readable_card_list = []
+        for card in self._split_hand3:
+            readable_card_list.append(card.get_name_and_suit())
+        return readable_card_list
+
     def clear_hand(self):
         """Clears the user's hand, returns the cards to the deck, and shuffles the deck"""
         for card in self._hand:
             deck.add_card_to_deck(card)
         for card in self._split_hand:
             deck.add_card_to_deck(card)
+        for card in self._split_hand2:
+            deck.add_card_to_deck(card)
+        for card in self._split_hand3:
+            deck.add_card_to_deck(card)
         deck.shuffle_deck()
         self._hand = []
         self._split_hand = []
+        self._split_hand2 = []
+        self._split_hand3 = []
 
     @property
     def amount_bet(self):
