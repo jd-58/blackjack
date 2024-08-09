@@ -167,6 +167,22 @@ class User:
             self._split_hand.append(game_deck.draw_card(is_face_up))
             i += 1
 
+    def draw_user_card_to_split_hand_2(self, game_deck, number_of_cards, is_face_up=True):
+        """Adds a specified number of cards to the user's 2nd split hand from a specified deck."""
+        game_deck.shuffle_deck()
+        i = 0
+        while i < number_of_cards:
+            self._split_hand2.append(game_deck.draw_card(is_face_up))
+            i += 1
+
+    def draw_user_card_to_split_hand_3(self, game_deck, number_of_cards, is_face_up=True):
+        """Adds a specified number of cards to the user's 3rd split hand from a specified deck."""
+        game_deck.shuffle_deck()
+        i = 0
+        while i < number_of_cards:
+            self._split_hand3.append(game_deck.draw_card(is_face_up))
+            i += 1
+
     def get_hand(self):
         """Returns the user's hand"""
         return self._hand
@@ -211,6 +227,14 @@ class User:
         """Returns the current contents of the user's split hand"""
         return self._split_hand
 
+    def get_split_hand_2(self):
+        """Returns the current contents of the user's 2nd split hand"""
+        return self._split_hand2
+
+    def get_split_hand_3(self):
+        """Returns the current contents of the user's 3rd split hand"""
+        return self._split_hand3
+
     def get_hand_value(self):
         """Gets the value of the user's current hand"""
         current_value = 0
@@ -221,6 +245,14 @@ class User:
     def get_amount_bet_on_split(self):
         """Gets the value of what the user has bet on a split hand"""
         return self._amount_bet_on_split
+
+    def get_amount_bet_on_split_2(self):
+        """Gets the value of what the user has bet on 2nd split hand"""
+        return self._amount_bet_on_split_2
+
+    def get_amount_bet_on_split_3(self):
+        """Gets the value of what the user has bet on 3rd split hand"""
+        return self._amount_bet_on_split_3
 
     def get_bankroll(self):
         """Returns the user's bankroll"""
@@ -234,6 +266,20 @@ class User:
         """Returns the value of the user's current split hand"""
         current_value = 0
         for card in self._split_hand:
+            current_value += card.get_value()
+        return current_value
+
+    def get_split_hand_2_value(self):
+        """Returns the value of the user's current 2nd split hand"""
+        current_value = 0
+        for card in self._split_hand2:
+            current_value += card.get_value()
+        return current_value
+
+    def get_split_hand_3_value(self):
+        """Returns the value of the user's current 3rd split hand"""
+        current_value = 0
+        for card in self._split_hand3:
             current_value += card.get_value()
         return current_value
 
@@ -491,6 +537,39 @@ def split_check():
             return False
 
 
+def split_check_2():
+    if user1.get_is_split_hand_active() is True:
+        user_split_hand = user1.get_split_hand()
+        if len(user_split_hand) == 2:
+            card1_split = user_split_hand[0].get_name()
+            card2_split = user_split_hand[1].get_name()
+            if card1_split == card2_split:
+                return True
+        return False
+
+
+def split_check_3():
+    if user1.get_is_split_hand_2_active() is True:
+        user_split_hand2 = user1.get_split_hand_2()
+        if len(user_split_hand2) == 2:
+            card1_split = user_split_hand2[0].get_name()
+            card2_split = user_split_hand2[1].get_name()
+            if card1_split == card2_split:
+                return True
+        return False
+
+
+def split_check_4():
+    if user1.get_is_split_hand_2_active() is True:
+        user_split_hand3 = user1.get_split_hand_3()
+        if len(user_split_hand3) == 2:
+            card1_split = user_split_hand3[0].get_name()
+            card2_split = user_split_hand3[1].get_name()
+            if card1_split == card2_split:
+                return True
+        return False
+
+
 def is_double_down_possible():
     if user1.get_is_split_hand_active() is True:
         user_split_hand = user1.get_split_hand()
@@ -526,6 +605,26 @@ def double_down():
 
 def split_cards():
     """Splits the user's cards if split_check returns true."""
+    if split_check_4() is True:
+        user1.set_split_hand_3_result('in-progress')
+        user_hand_to_split = user1.get_split_hand_2()
+        user1.update_split_hand_3(user_hand_to_split[0])
+        user1.update_amount_bet_on_split_3(user1.get_amount_bet_on_split_2())
+        user1.update_bankroll(-user1.get_amount_bet_on_split_3())
+        pot.update_bankroll(user1.get_amount_bet_on_split_3())
+        user1.set_is_split_hand_3_active(True)
+        del user_hand_to_split[0]
+        return
+    if split_check_3() is True:
+        user1.set_split_hand_2_result('in-progress')
+        user_hand_to_split = user1.get_split_hand()
+        user1.update_split_hand_2(user_hand_to_split[0])
+        user1.update_amount_bet_on_split_2(user1.get_amount_bet_on_split())
+        user1.update_bankroll(-user1.get_amount_bet_on_split())
+        pot.update_bankroll(user1.get_amount_bet_on_split_2())
+        user1.set_is_split_hand_2_active(True)
+        del user_hand_to_split[0]
+        return
     if split_check() is True:
         user1.set_split_hand_result('in-progress')
         user_hand = user1.get_hand()
@@ -535,6 +634,7 @@ def split_cards():
         pot.update_bankroll(user1.get_amount_bet_on_split())
         user1.set_is_split_hand_active(True)
         del user_hand[0]
+        return
 
 
 def draw_specific_cards_button_func():  # This is for testing certain hand combinations and results
@@ -553,7 +653,6 @@ def draw_specific_cards_button_func():  # This is for testing certain hand combi
     split_check()
 
 
-
 def check_dealer_score():
     if dealer.get_hand_value() > 17:
         for card in dealer.get_hand():
@@ -561,6 +660,44 @@ def check_dealer_score():
 
 
 def hit():
+    if user1.get_is_split_hand_3_active() is True:
+        user1.draw_user_card_to_split_hand_3(deck, 1, True)
+        user_split_hand3 = user1.get_split_hand_3()
+        ace_needs_to_change = False
+        for card in user_split_hand3:
+            if card.get_name() == 'ace' and card.get_has_value_changed() is False:
+                ace_needs_to_change = True
+        if user1.get_split_hand_3_value() > 21 and ace_needs_to_change is True:
+            for card in user1.get_split_hand_3():
+                if card.get_name() == 'ace':
+                    if card.get_value() != 1:
+                        card.set_value(1)
+                        return
+        if user1.get_split_hand_3_value() > 21:
+            user1.set_split_hand_3_result('loss')
+            dealer.set_split_hand_3_result('win')
+            user1.set_is_split_hand_3_active(False)
+        return
+
+    if user1.get_is_split_hand_2_active() is True:
+        user1.draw_user_card_to_split_hand_2(deck, 1, True)
+        user_split_hand2 = user1.get_split_hand_2()
+        ace_needs_to_change = False
+        for card in user_split_hand2:
+            if card.get_name() == 'ace' and card.get_has_value_changed() is False:
+                ace_needs_to_change = True
+        if user1.get_split_hand_2_value() > 21 and ace_needs_to_change is True:
+            for card in user1.get_split_hand_2():
+                if card.get_name() == 'ace':
+                    if card.get_value() != 1:
+                        card.set_value(1)
+                        return
+        if user1.get_split_hand_2_value() > 21:
+            user1.set_split_hand_2_result('loss')
+            dealer.set_split_hand_2_result('win')
+            user1.set_is_split_hand_2_active(False)
+        return
+
     if user1.get_is_split_hand_active() is True:
         user1.draw_user_card_to_split_hand(deck, 1, True)
         user_split_hand = user1.get_split_hand()
@@ -600,6 +737,12 @@ def hit():
 
 
 def stand():
+    if user1.get_is_split_hand_3_active() is True:
+        user1.set_is_split_hand_3_active(False)
+        return
+    if user1.get_is_split_hand_2_active() is True:
+        user1.set_is_split_hand_2_active(False)
+        return
     if user1.get_is_split_hand_active() is True:
         user1.set_is_split_hand_active(False)
         return
@@ -627,6 +770,7 @@ def initial_score_check():
 
 def refill_bankroll():
     user1.set_bankroll(1000)
+
 
 def clear_table():
     if check_for_ace(user1) is True:
@@ -659,6 +803,23 @@ def set_ace_to_11():
 
 
 def turn_over_check():
+    if user1.get_split_hand_3():
+        if (user1.get_turn_result() != 'in-progress' and user1.get_split_hand_result() != 'in-progress'
+                and user1.get_split_hand_2_result() != 'in-progress'
+                and user1.get_split_hand_3_result() != 'in-progress' and dealer.get_turn_result() != 'in-progress'):
+            dealer_hand = dealer.get_hand()
+            for card in dealer_hand:
+                card.set_face_up(True)
+            distribute_chips_from_pot()
+            return
+    if user1.get_split_hand_2():
+        if (user1.get_turn_result() != 'in-progress' and user1.get_split_hand_result() != 'in-progress'
+                and user1.get_split_hand_2_result() != 'in-progress' and dealer.get_turn_result() != 'in-progress'):
+            dealer_hand = dealer.get_hand()
+            for card in dealer_hand:
+                card.set_face_up(True)
+            distribute_chips_from_pot()
+            return
     if user1.get_split_hand():
         if (user1.get_turn_result() != 'in-progress' and user1.get_split_hand_result() != 'in-progress'
                 and dealer.get_turn_result() != 'in-progress'):
@@ -722,11 +883,61 @@ def split_hand_score_check():
             user1.set_split_hand_result('win')
             dealer.set_split_hand_result('loss')
             return True
-        elif (user1.get_hand_value() > 21  # User bust
+        elif (user1.get_split_hand_value() > 21  # User bust
               or user1.get_split_hand_value() < dealer.get_hand_value() <= 21  # Neither bust, dealer has higher hand
               or dealer.get_hand_value() == 21):  # Dealer blackjack
             user1.set_split_hand_result('loss')
             dealer.set_split_hand_result('win')
+            return True
+    return False
+
+
+def split_hand_2_score_check():
+    if user1.get_split_hand_2_result() is not None:
+        if 21 >= user1.get_split_hand_2_value() == dealer.get_hand_value():
+            #  If the user and dealer tie
+            user1.set_split_hand_2_result('push')
+            dealer.set_split_hand_2_result('push')
+            return True
+        elif user1.get_split_hand_2_value() == 21 and dealer.get_hand_value() != 21:  # User blackjack
+            user1.set_split_hand_2_result('blackjack')
+            dealer.set_split_hand_2_result('loss')
+            return True
+        elif (dealer.get_hand_value() < user1.get_split_hand_2_value() <= 21  # Neither bust, user has higher hand
+              or dealer.get_hand_value() > 21 >= user1.get_split_hand_2_value()):  # Dealer bust, user does not
+            user1.set_split_hand_2_result('win')
+            dealer.set_split_hand_2_result('loss')
+            return True
+        elif (user1.get_split_hand_2_value() > 21  # User bust
+              or user1.get_split_hand_2_value() < dealer.get_hand_value() <= 21  # Neither bust, dealer has higher hand
+              or dealer.get_hand_value() == 21):  # Dealer blackjack
+            user1.set_split_hand_2_result('loss')
+            dealer.set_split_hand_2_result('win')
+            return True
+    return False
+
+
+def split_hand_3_score_check():
+    if user1.get_split_hand_3_result() is not None:
+        if 21 >= user1.get_split_hand_3_value() == dealer.get_hand_value():
+            #  If the user and dealer tie
+            user1.set_split_hand_3_result('push')
+            dealer.set_split_hand_3_result('push')
+            return True
+        elif user1.get_split_hand_3_value() == 21 and dealer.get_hand_value() != 21:  # User blackjack
+            user1.set_split_hand_3_result('blackjack')
+            dealer.set_split_hand_3_result('loss')
+            return True
+        elif (dealer.get_hand_value() < user1.get_split_hand_2_value() <= 21  # Neither bust, user has higher hand
+              or dealer.get_hand_value() > 21 >= user1.get_split_hand_2_value()):  # Dealer bust, user does not
+            user1.set_split_hand_3_result('win')
+            dealer.set_split_hand_3_result('loss')
+            return True
+        elif (user1.get_split_hand_3_value() > 21  # User bust
+              or user1.get_split_hand_3_value() < dealer.get_hand_value() <= 21  # Neither bust, dealer has higher hand
+              or dealer.get_hand_value() == 21):  # Dealer blackjack
+            user1.set_split_hand_3_result('loss')
+            dealer.set_split_hand_3_result('win')
             return True
     return False
 
@@ -738,6 +949,8 @@ def check_to_change_ace(user):
 
 
 def final_score_check():
+    split_hand_3_score_check()
+    split_hand_2_score_check()
     split_hand_score_check()
     if 21 >= user1.get_hand_value() == dealer.get_hand_value():
         #  If the user and dealer tie
@@ -1074,7 +1287,6 @@ while running:
 
         draw_text("Split hand result: ", text_font, black, screen_width // 2 + 250, 100)
         draw_text(str(user1.get_split_hand_result()), text_font, black, screen_width // 2 + 400, 100)
-
 
     deal_cards_button.draw()
     hit_button.draw()
