@@ -362,7 +362,9 @@ def draw_cards_button_func():
     dealer.draw_user_card(deck, 1, True)
     dealer.draw_user_card(deck, 1, False)
     initial_score_check()
-    split_check(user1)
+    is_double_down_possible()
+    print(is_double_down_possible())
+    split_check()
 
 
 """def hit_specific_cards():
@@ -384,10 +386,10 @@ def draw_cards_button_func():
         dealer.set_turn_result('win')"""
 
 
-def split_check(user):
+def split_check():
     """Checks if the user has two cards of the same value after the first two cards are dealt.
     If so, the function returns True."""
-    user_hand = user.get_hand()
+    user_hand = user1.get_hand()
     if len(user_hand) == 2:
         card1 = user_hand[0].get_name()
         card2 = user_hand[1].get_name()
@@ -397,9 +399,42 @@ def split_check(user):
             return False
 
 
+def is_double_down_possible():
+    if user1.get_is_split_hand_active() is True:
+        user_split_hand = user1.get_split_hand()
+        if len(user_split_hand) == 2 and 8 < user1.get_split_hand_value() < 12:
+            return True
+        else:
+            return False
+    user_hand = user1.get_hand()
+    if len(user_hand) == 2 and 8 < user1.get_hand_value() < 12:
+        return True
+    else:
+        return False
+
+
+def double_down():
+    if is_double_down_possible() is True:
+        if user1.get_is_split_hand_active() is True:
+            pot.update_bankroll(user1.get_amount_bet_on_split())
+            user1.update_bankroll(-user1.get_amount_bet_on_split())
+            user1.update_amount_bet_on_split(user1.get_amount_bet_on_split())
+            user1.draw_user_card_to_split_hand(deck, 1, True)
+            # Should be face down, update later
+            stand()
+            return
+        pot.update_bankroll(user1.get_amount_bet())
+        user1.update_bankroll(-user1.get_amount_bet())
+        user1.update_amount_bet(user1.get_amount_bet())
+        user1.draw_user_card(deck, 1, True)
+        stand()
+        return
+    return
+
+
 def split_cards():
     """Splits the user's cards if split_check returns true."""
-    if split_check(user1) is True:
+    if split_check() is True:
         user1.set_split_hand_result('in-progress')
         user_hand = user1.get_hand()
         user1.update_split_hand(user_hand[0])
@@ -411,16 +446,19 @@ def split_cards():
 
 
 def draw_specific_cards_button_func():  # This is for testing certain hand combinations and results
-    card1 = Card(11, 'ace', 'hearts', True)
-    card2 = Card(11, 'ace', 'diamonds', False)
-    new_hand1 = [card1, card2]
+    # card1 = Card(11, 'ace', 'hearts', True)
+    # card2 = Card(11, 'ace', 'diamonds', False)
+    # new_hand1 = [card1, card2]
     card3 = Card(7, '7', 'hearts', True)
     card4 = Card(7, '7', 'clubs', True)
-    dealer.set_hand(new_hand1)
+    # dealer.set_hand(new_hand1)
     new_hand2 = [card3, card4]
-    user1.draw_user_card(deck, 2, True)
+    user1.set_hand(new_hand2)
+    dealer.draw_user_card(deck, 1, True)
+    dealer.draw_user_card(deck, 1, False)
     initial_score_check()
-    split_check(user1)
+    is_double_down_possible()
+    split_check()
 
 
 
@@ -448,7 +486,6 @@ def hit():
             user1.set_split_hand_result('loss')
             dealer.set_split_hand_result('win')
             user1.set_is_split_hand_active(False)
-            print("Split hand not active")
         return
 
     user1.draw_user_card(deck, 1, True)
@@ -473,7 +510,6 @@ def hit():
 def stand():
     if user1.get_is_split_hand_active() is True:
         user1.set_is_split_hand_active(False)
-        print("split hand is not active")
         return
     dealer_hand = dealer.get_hand()
     dealer_hand[1].set_face_up(True)
@@ -481,7 +517,6 @@ def stand():
     while dealer.get_hand_value() <= 16:
         dealer.draw_user_card(deck, 1, True)
         check_to_change_ace(dealer)
-        print("Test")
     final_score_check()
 
 
@@ -498,6 +533,9 @@ def initial_score_check():
         user1.set_turn_result('push')
 
 
+def refill_bankroll():
+    user1.set_bankroll(1000)
+
 def clear_table():
     if check_for_ace(user1) is True:
         change_ace_value_to_11(user1)
@@ -505,6 +543,7 @@ def clear_table():
         change_ace_value_to_11(dealer)
     user1.set_turn_result('in-progress')
     user1.clear_hand()
+    pot.set_bankroll(0)
     user1.set_is_split_hand_active(False)
     user1.set_split_hand_result(None)
     dealer.set_turn_result('in-progress')
@@ -681,6 +720,19 @@ deal_cards_button = Button(
     onClick=draw_cards_button_func
 )
 
+double_down_button = Button(
+    screen,
+    screen_width // 2 + 100,  # X coordinate of the top-left corner
+    450,  # Y coordinate of the top-left corner
+    125,
+    25,
+    text='Double Down',
+    fontSize=20, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    onClick=double_down
+)
+
 deal_specific_cards_button = Button(  # For testing
     screen,
     screen_width // 2 - 250,  # X coordinate of the top-left corner
@@ -692,6 +744,19 @@ deal_specific_cards_button = Button(  # For testing
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
     onClick=draw_specific_cards_button_func
+)
+
+refill_bankroll_button = Button(
+    screen,
+    screen_width // 2 + 450,  # X coordinate of the top-left corner
+    575,  # Y coordinate of the top-left corner
+    125,
+    25,
+    text='Refill Bank',
+    fontSize=20, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    onClick=refill_bankroll
 )
 
 hit_button = Button(
@@ -931,7 +996,13 @@ while running:
     one_hundred_dollar_chip.draw()
     five_hundred_dollar_chip.draw()
     one_thousand_dollar_chip.draw()
-    split_button.draw()
+    refill_bankroll_button.draw()
+
+    if is_double_down_possible() is True:
+        double_down_button.draw()
+
+    if split_check() is True:
+        split_button.draw()
 
     pygame.display.flip()
     pygame.display.update()
