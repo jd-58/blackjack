@@ -609,17 +609,21 @@ def double_down():
 
 def split_cards():
     """Splits the user's cards if split_check returns true."""
-    if split_check_4() is True:
+    print("split check 4:", split_check_4())
+    print("split check 3:", split_check_3())
+    print("split check 2:", split_check_2())
+    print("split check 1:", split_check())
+    if split_check_3() is True:
         user1.set_split_hand_3_result('in-progress')
         user_hand_to_split = user1.get_split_hand_2()
         user1.update_split_hand_3(user_hand_to_split[0])
-        user1.update_amount_bet_on_split_3(user1.get_amount_bet_on_split_2())
-        user1.update_bankroll(-user1.get_amount_bet_on_split_3())
-        pot.update_bankroll(user1.get_amount_bet_on_split_3())
+        user1.update_amount_bet_on_split_2(user1.get_amount_bet_on_split())
+        user1.update_bankroll(-user1.get_amount_bet_on_split())
+        pot.update_bankroll(user1.get_amount_bet_on_split_2())
         user1.set_is_split_hand_3_active(True)
         del user_hand_to_split[0]
         return
-    if split_check_3() is True:
+    if split_check_2() is True:
         user1.set_split_hand_2_result('in-progress')
         user_hand_to_split = user1.get_split_hand()
         user1.update_split_hand_2(user_hand_to_split[0])
@@ -664,9 +668,15 @@ def check_dealer_score():
 
 
 def hit():
+    split_check_4()
+    split_check_3()
+    split_check_2()
+    split_check()
     if user1.get_is_split_hand_3_active() is True:
         user1.draw_user_card_to_split_hand_3(deck, 1, True)
+        # specific_card = Card(7, '7', 'clubs', True) # For testing only
         user_split_hand3 = user1.get_split_hand_3()
+        # user_split_hand3.append(specific_card) # For testing only
         ace_needs_to_change = False
         for card in user_split_hand3:
             if card.get_name() == 'ace' and card.get_has_value_changed() is False:
@@ -685,7 +695,9 @@ def hit():
 
     if user1.get_is_split_hand_2_active() is True:
         user1.draw_user_card_to_split_hand_2(deck, 1, True)
+        # specific_card = Card(7, '7', 'clubs', True) # For testing only
         user_split_hand2 = user1.get_split_hand_2()
+        # user_split_hand2.append(specific_card) # For testing only
         ace_needs_to_change = False
         for card in user_split_hand2:
             if card.get_name() == 'ace' and card.get_has_value_changed() is False:
@@ -704,7 +716,9 @@ def hit():
 
     if user1.get_is_split_hand_active() is True:
         user1.draw_user_card_to_split_hand(deck, 1, True)
+        # specific_card = Card(7, '7', 'clubs', True) # For testing only
         user_split_hand = user1.get_split_hand()
+        # user_split_hand.append(specific_card) # For testing only
         ace_needs_to_change = False
         for card in user_split_hand:
             if card.get_name() == 'ace' and card.get_has_value_changed() is False:
@@ -722,7 +736,9 @@ def hit():
         return
 
     user1.draw_user_card(deck, 1, True)
+    # specific_card = Card(7, '7', 'clubs', True) # For testing only
     user_hand = user1.get_hand()
+    # user_hand.append(specific_card) # For testing only
     ace_needs_to_change = False
     for card in user_hand:
         if card.get_name() == 'ace' and card.get_has_value_changed() is False:
@@ -787,6 +803,10 @@ def clear_table():
     pot.set_bankroll(0)
     user1.set_is_split_hand_active(False)
     user1.set_split_hand_result(None)
+    user1.set_is_split_hand_2_active(False)
+    user1.set_split_hand_2_result(None)
+    user1.set_is_split_hand_3_active(False)
+    user1.set_split_hand_3_result(None)
     dealer.set_turn_result('in-progress')
     dealer.clear_hand()
 
@@ -984,7 +1004,7 @@ def distribute_chips_from_pot():
     if user1.get_split_hand_result() is not None:
         if user1.get_split_hand_result() == 'win' or user1.get_split_hand_result() == 'blackjack':
             user1.update_bankroll(2 * user1.get_amount_bet_on_split())
-            pot.update_bankroll(-(2 * user1.get_amount_bet_on_split()))
+            pot.set_bankroll(0)
             user1.set_amount_bet_on_split(0)
         elif user1.get_split_hand_result() == 'push':
             user1.update_bankroll(user1.get_amount_bet_on_split())
@@ -993,6 +1013,30 @@ def distribute_chips_from_pot():
         elif user1.get_split_hand_result() == 'loss':
             pot.update_bankroll(-user1.get_amount_bet_on_split())
             user1.set_amount_bet_on_split(0)
+    if user1.get_split_hand_2_result() is not None:
+        if user1.get_split_hand_2_result() == 'win' or user1.get_split_hand_2_result() == 'blackjack':
+            user1.update_bankroll(2 * user1.get_amount_bet_on_split_2())
+            pot.set_bankroll(0)
+            user1.set_amount_bet_on_split_2(0)
+        elif user1.get_split_hand_2_result() == 'push':
+            user1.update_bankroll(user1.get_amount_bet_on_split_2())
+            pot.set_bankroll(0)
+            user1.set_amount_bet_on_split_2(0)
+        elif user1.get_split_hand_2_result() == 'loss':
+            user1.set_amount_bet_on_split_2(0)
+            pot.set_bankroll(0)
+    if user1.get_split_hand_3_result() is not None:
+        if user1.get_split_hand_3_result() == 'win' or user1.get_split_hand_3_result() == 'blackjack':
+            user1.update_bankroll(2 * user1.get_amount_bet_on_split_2())
+            pot.set_bankroll(0)
+            user1.set_amount_bet_on_split_2(0)
+        elif user1.get_split_hand_3_result() == 'push':
+            user1.update_bankroll(user1.get_amount_bet_on_split_2())
+            pot.set_bankroll(0)
+            user1.set_amount_bet_on_split_2(0)
+        elif user1.get_split_hand_3_result() == 'loss':
+            user1.set_amount_bet_on_split_2(0)
+            pot.set_bankroll(0)
     if user1.get_turn_result() == 'win':
         user1.update_bankroll(2 * user1.get_amount_bet())
         pot.set_bankroll(0)
@@ -1294,28 +1338,27 @@ while running:
         draw_text(str(user1.get_split_hand_result()), text_font, black, screen_width // 2 + 400, 100)
 
     if user1.get_split_hand_2_result() is not None:
-        draw_text("Your 2nd split cards are: ", text_font, black, screen_width // 2 - 325, 550)
-        draw_text(str(user1.show_split_hand_2()), text_font, black, screen_width // 2 - 325, 600)
+        draw_text("Your 2nd split cards are: ", text_font, black, screen_width // 2 - 400, 450)
+        draw_text(str(user1.show_split_hand_2()), text_font, black, screen_width // 2 - 400, 500)
 
-        draw_text("Your 2nd split score: ", text_font, black, screen_width // 2 + 250, 525)
-        draw_text(str(user1.get_split_hand_2_value()), text_font, black, screen_width // 2 + 350, 525)
+        draw_text("Your 2nd split score: ", text_font, black, screen_width // 2 + 250, 500)
+        draw_text(str(user1.get_split_hand_2_value()), text_font, black, screen_width // 2 + 400, 500)
 
-        draw_text("Split hand 2 result: ", text_font, black, screen_width // 2 + 250, 100)
-        draw_text(str(user1.get_split_hand_result()), text_font, black, screen_width // 2 + 400, 100)
+        draw_text("Split hand 2 result: ", text_font, black, screen_width // 2 + 250, 125)
+        draw_text(str(user1.get_split_hand_2_result()), text_font, black, screen_width // 2 + 400, 125)
 
     if user1.get_split_hand_3_result() is not None:
-        draw_text("Your 3rd split cards are: ", text_font, black, screen_width // 2 - 325, 550)
-        draw_text(str(user1.show_split_hand_3()), text_font, black, screen_width // 2 - 325, 600)
+        draw_text("Your 3rd split cards are: ", text_font, black, screen_width // 2 - 500, 650)
+        draw_text(str(user1.show_split_hand_3()), text_font, black, screen_width // 2 - 500, 675)
 
-        draw_text("Your 3rd split score: ", text_font, black, screen_width // 2 + 250, 525)
-        draw_text(str(user1.get_split_hand_3_value()), text_font, black, screen_width // 2 + 350, 525)
+        draw_text("Your 3rd split score: ", text_font, black, screen_width // 2 + 250, 475)
+        draw_text(str(user1.get_split_hand_3_value()), text_font, black, screen_width // 2 + 400, 475)
 
-        draw_text("Split hand 3 result: ", text_font, black, screen_width // 2 + 250, 100)
-        draw_text(str(user1.get_split_hand_3_result()), text_font, black, screen_width // 2 + 400, 100)
+        draw_text("Split hand 3 result: ", text_font, black, screen_width // 2 + 250, 150)
+        draw_text(str(user1.get_split_hand_3_result()), text_font, black, screen_width // 2 + 400, 150)
 
     deal_cards_button.draw()
     hit_button.draw()
-    # hit_specific_card_button.draw()
     stand_button.draw()
     clear_button.draw()
     # deal_specific_cards_button.draw()
@@ -1330,7 +1373,8 @@ while running:
     if is_double_down_possible() is True:
         double_down_button.draw()
 
-    if split_check() or split_check_2() or split_check_3() or split_check_4() is True:
+    if (split_check() or split_check_2() or split_check_3() or split_check_4() is True
+            and user1.get_split_hand_3() is None):
         split_button.draw()
 
     pygame.display.flip()
