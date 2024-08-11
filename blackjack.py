@@ -452,44 +452,50 @@ pot = User("pot", 0)
 #  Need separate functions for each bet, since functions assigned to a button in pygame can't have parameters.
 def user_bet_one():
     """Takes 1 chip out of the user's bankroll and adds it to the pot"""
-    user1.update_bankroll(-1)
-    user1.update_amount_bet(1)
-    pot.update_bankroll(1)
+    if user1.get_bankroll() >= 1:
+        user1.update_bankroll(-1)
+        user1.update_amount_bet(1)
+        pot.update_bankroll(1)
 
 
 def user_bet_five():
     """Takes 5 chips out of the user's bankroll and adds it to the pot"""
-    user1.update_bankroll(-5)
-    user1.update_amount_bet(5)
-    pot.update_bankroll(5)
+    if user1.get_bankroll() >= 5:
+        user1.update_bankroll(-5)
+        user1.update_amount_bet(5)
+        pot.update_bankroll(5)
 
 
 def user_bet_twenty_five():
     """Takes 25 chips out of the user's bankroll and adds it to the pot"""
-    user1.update_bankroll(-25)
-    user1.update_amount_bet(25)
-    pot.update_bankroll(25)
+    if user1.get_bankroll() >= 25:
+            user1.update_bankroll(-25)
+            user1.update_amount_bet(25)
+            pot.update_bankroll(25)
 
 
 def user_bet_one_hundred():
     """Takes 100 chips out of the user's bankroll and adds it to the pot"""
-    user1.update_bankroll(-100)
-    user1.update_amount_bet(100)
-    pot.update_bankroll(100)
+    if user1.get_bankroll() >= 100:
+        user1.update_bankroll(-100)
+        user1.update_amount_bet(100)
+        pot.update_bankroll(100)
 
 
 def user_bet_five_hundred():
     """Takes 500 chips out of the user's bankroll and adds it to the pot"""
-    user1.update_bankroll(-500)
-    user1.update_amount_bet(500)
-    pot.update_bankroll(500)
+    if user1.get_bankroll() >= 500:
+        user1.update_bankroll(-500)
+        user1.update_amount_bet(500)
+        pot.update_bankroll(500)
 
 
 def user_bet_one_thousand():
     """Takes 1000 chips out of the user's bankroll and adds it to the pot"""
-    user1.update_bankroll(-1000)
-    user1.update_amount_bet(1000)
-    pot.update_bankroll(1000)
+    if user1.get_bankroll() >= 1000:
+        user1.update_bankroll(-1000)
+        user1.update_amount_bet(1000)
+        pot.update_bankroll(1000)
 
 
 dealer = User("Dealer")
