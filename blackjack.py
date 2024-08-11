@@ -10,11 +10,10 @@ import pygame.freetype
 
 # To try and embedd my game in browser: https://pygame-web.github.io/#demos-on-itchio
 
-# TO-DO: make sure user cannot place a bet to take their bankroll below 0
-# TO-DO: final check on splitting. if a user has already split, and they are back on their original hand, make sure the
-# resulting split results in a new split hand (if one is available) is created. right now the card gets added to split
-# hand number 1, which is supposed to be finished.
-# add insurance.
+# TO-DO: make sure aces behave correctly when two are dealt to the user at the start. they are both automatically
+# changed to a value of 1 each. This carries over if they are split.
+
+# TO-DO: add insurance.
 
 
 class Card:
@@ -139,6 +138,7 @@ class User:
         self._split_hand = []
         self._split_hand2 = []
         self._split_hand3 = []
+        self._can_bet = True
         self._bankroll = 1000
         self._score = 0
         self._turn_result = 'in-progress'
@@ -153,6 +153,7 @@ class User:
         self._split_hand_result = None
         self._split_hand_2_result = None
         self._split_hand_3_result = None
+        self._illegal_action = False
 
     def draw_user_card(self, game_deck, number_of_cards, is_face_up=True):
         """Adds a specified number of cards to the user's hand from the deck."""
@@ -189,6 +190,10 @@ class User:
     def get_hand(self):
         """Returns the user's hand"""
         return self._hand
+
+    def get_can_user_bet(self):
+        """Returns True if the user is able to bet, False if not"""
+        return self._can_bet
 
     def get_split_hand_result(self):
         """Returns the result of the current split hand. Is None if a split hand is not active"""
@@ -305,6 +310,10 @@ class User:
     def set_hand(self, specified_hand):
         """Changes the user's hand. For testing purposes"""
         self._hand = specified_hand
+
+    def set_can_user_bet(self, new_value):
+        """Changes whether the user can bet. True if they can, false if they cannot"""
+        self._can_bet = new_value
 
     def set_split_hand_result(self, new_result):
         """Updates the result/status of the current split hand"""
@@ -452,7 +461,7 @@ pot = User("pot", 0)
 #  Need separate functions for each bet, since functions assigned to a button in pygame can't have parameters.
 def user_bet_one():
     """Takes 1 chip out of the user's bankroll and adds it to the pot"""
-    if user1.get_bankroll() >= 1:
+    if user1.get_can_user_bet() is True and user1.get_bankroll() >= 1:
         user1.update_bankroll(-1)
         user1.update_amount_bet(1)
         pot.update_bankroll(1)
@@ -460,7 +469,7 @@ def user_bet_one():
 
 def user_bet_five():
     """Takes 5 chips out of the user's bankroll and adds it to the pot"""
-    if user1.get_bankroll() >= 5:
+    if user1.get_bankroll() >= 5 and user1.get_can_user_bet() is True:
         user1.update_bankroll(-5)
         user1.update_amount_bet(5)
         pot.update_bankroll(5)
@@ -468,7 +477,7 @@ def user_bet_five():
 
 def user_bet_twenty_five():
     """Takes 25 chips out of the user's bankroll and adds it to the pot"""
-    if user1.get_bankroll() >= 25:
+    if user1.get_bankroll() >= 25 and user1.get_can_user_bet() is True:
             user1.update_bankroll(-25)
             user1.update_amount_bet(25)
             pot.update_bankroll(25)
@@ -476,7 +485,7 @@ def user_bet_twenty_five():
 
 def user_bet_one_hundred():
     """Takes 100 chips out of the user's bankroll and adds it to the pot"""
-    if user1.get_bankroll() >= 100:
+    if user1.get_bankroll() >= 100 and user1.get_can_user_bet() is True:
         user1.update_bankroll(-100)
         user1.update_amount_bet(100)
         pot.update_bankroll(100)
@@ -484,7 +493,7 @@ def user_bet_one_hundred():
 
 def user_bet_five_hundred():
     """Takes 500 chips out of the user's bankroll and adds it to the pot"""
-    if user1.get_bankroll() >= 500:
+    if user1.get_bankroll() >= 500 and user1.get_can_user_bet() is True:
         user1.update_bankroll(-500)
         user1.update_amount_bet(500)
         pot.update_bankroll(500)
@@ -492,7 +501,7 @@ def user_bet_five_hundred():
 
 def user_bet_one_thousand():
     """Takes 1000 chips out of the user's bankroll and adds it to the pot"""
-    if user1.get_bankroll() >= 1000:
+    if user1.get_bankroll() >= 1000 and user1.get_can_user_bet() is True:
         user1.update_bankroll(-1000)
         user1.update_amount_bet(1000)
         pot.update_bankroll(1000)
@@ -505,12 +514,13 @@ blackjack = 21
 
 def draw_cards_button_func():
     deck.shuffle_deck()
+    deck.shuffle_deck()
+    user1.set_can_user_bet(False)
     user1.draw_user_card(deck, 2, True)
     dealer.draw_user_card(deck, 1, True)
     dealer.draw_user_card(deck, 1, False)
     initial_score_check()
     is_double_down_possible()
-    print(is_double_down_possible())
     split_check()
 
 
@@ -622,6 +632,10 @@ def split_cards():
     if split_check_3() is True:
         user1.set_split_hand_3_result('in-progress')
         user_hand_to_split = user1.get_split_hand_2()
+        for card in user_hand_to_split:
+            if card.get_name() == 'ace':
+                card.set_value(11)
+                card.set_has_value_changed(False)
         user1.update_split_hand_3(user_hand_to_split[0])
         user1.update_amount_bet_on_split_2(user1.get_amount_bet_on_split())
         user1.update_bankroll(-user1.get_amount_bet_on_split())
@@ -632,6 +646,10 @@ def split_cards():
     if split_check_2() is True:
         user1.set_split_hand_2_result('in-progress')
         user_hand_to_split = user1.get_split_hand()
+        for card in user_hand_to_split:
+            if card.get_name() == 'ace':
+                card.set_value(11)
+                card.set_has_value_changed(False)
         user1.update_split_hand_2(user_hand_to_split[0])
         user1.update_amount_bet_on_split_2(user1.get_amount_bet_on_split())
         user1.update_bankroll(-user1.get_amount_bet_on_split())
@@ -642,6 +660,10 @@ def split_cards():
     if split_check() is True:
         user1.set_split_hand_result('in-progress')
         user_hand = user1.get_hand()
+        for card in user_hand:
+            if card.get_name() == 'ace':
+                card.set_value(11)
+                card.set_has_value_changed(False)
         user1.update_split_hand(user_hand[0])
         user1.update_amount_bet_on_split(user1.get_amount_bet())
         user1.update_bankroll(-user1.get_amount_bet_on_split())
@@ -655,8 +677,9 @@ def draw_specific_cards_button_func():  # This is for testing certain hand combi
     # card1 = Card(11, 'ace', 'hearts', True)
     # card2 = Card(11, 'ace', 'diamonds', False)
     # new_hand1 = [card1, card2]
-    card3 = Card(7, '7', 'hearts', True)
-    card4 = Card(7, '7', 'clubs', True)
+    user1.set_can_user_bet(False)
+    card3 = Card(11, 'ace', 'hearts', True)
+    card4 = Card(1, 'ace', 'clubs', True)
     # dealer.set_hand(new_hand1)
     new_hand2 = [card3, card4]
     user1.set_hand(new_hand2)
@@ -674,6 +697,8 @@ def check_dealer_score():
 
 
 def hit():
+    if pot.get_bankroll() == 0:
+        return "No bets placed"
     split_check_4()
     split_check_3()
     split_check_2()
@@ -763,6 +788,8 @@ def hit():
 
 
 def stand():
+    if pot.get_bankroll() == 0:
+        return "No bets placed"
     if user1.get_is_split_hand_3_active() is True:
         user1.set_is_split_hand_3_active(False)
         return
@@ -815,6 +842,7 @@ def clear_table():
     user1.set_split_hand_3_result(None)
     dealer.set_turn_result('in-progress')
     dealer.clear_hand()
+    user1.set_can_user_bet(True)
 
 
 def set_ace_to_1():
@@ -882,6 +910,7 @@ def change_ace_value_to_1(user):
     for card in user_hand:
         if card.get_name() == 'ace':
             card.set_value(1)
+            return
 
 
 def check_for_ace_to_change(user):
@@ -1058,6 +1087,7 @@ def distribute_chips_from_pot():
     elif user1.get_turn_result() == 'loss':
         pot.set_bankroll(0)
         user1.set_amount_bet(0)
+
 
 
 pygame.init()
@@ -1293,6 +1323,7 @@ blue = (0, 0, 128)
 black = (0, 0, 0)
 
 text_font = pygame.font.SysFont("Arial", 18)
+big_text_font = pygame.font.SysFont("Arial", 35)
 
 
 def draw_text(text, font, text_color, x, y):
@@ -1363,11 +1394,15 @@ while running:
         draw_text("Split hand 3 result: ", text_font, black, screen_width // 2 + 250, 150)
         draw_text(str(user1.get_split_hand_3_result()), text_font, black, screen_width // 2 + 400, 150)
 
+    if user1.get_can_user_bet() is True:
+        draw_text("Place your bets!", big_text_font, black, screen_width // 2 - 100, 450)
+
+
     deal_cards_button.draw()
     hit_button.draw()
     stand_button.draw()
     clear_button.draw()
-    # deal_specific_cards_button.draw()
+    deal_specific_cards_button.draw()
     one_dollar_chip.draw()
     five_dollar_chip.draw()
     twenty_five_dollar_chip.draw()
