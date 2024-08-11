@@ -23,11 +23,11 @@ class Card:
         """Initializes a card object with a value and a suit/"""
         self._value = value
         self._suit = suit
-        self._image = None
         self._face_up = face_up
         self._name = str(name)
-        self._name_and_suit = str(name) + " " + str(self._suit)
+        self._name_and_suit = str(name) + "_" + str(self._suit)
         self._has_value_changed = has_value_changed
+        self._image = self._name_and_suit + '.png'
 
     def get_card(self):
         """Returns the string card value and then suit"""
