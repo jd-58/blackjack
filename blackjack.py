@@ -1622,7 +1622,6 @@ while running:
 
     if split_check() is True or split_check_2() is True or split_check_3() is True or split_check_4() is True:
         if user1.get_split_count_this_turn() < 3:
-            print("Test")
             split_button.draw()
 
 
