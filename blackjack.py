@@ -153,7 +153,7 @@ class User:
         self._split_hand_result = None
         self._split_hand_2_result = None
         self._split_hand_3_result = None
-        self._cards_ready_to_be_drawn = True
+        self._cards_ready_to_be_drawn = False
         self._split_count_during_turn = 0
 
     def draw_user_card(self, game_deck, number_of_cards, is_face_up=True):
