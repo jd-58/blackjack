@@ -1010,11 +1010,13 @@ def change_ace_value_to_11(user):
             card.set_has_value_changed(False)
             card.set_value(11)
 
+
 def change_ace_value_to_11_for_all_user_hands(hand):
     for item in hand:
         if item.get_name() == 'ace':
             item.set_has_value_changed(False)
             item. set_value(11)
+
 
 def change_ace_value_to_1(user):
     user_hand = user.get_hand()
@@ -1461,14 +1463,14 @@ while running:
     draw_text("Pot: ", text_font, black, screen_width // 2 - 25, 300)
     draw_text(str(pot.get_bankroll()), text_font, black, screen_width // 2 + 25, 300)
 
-    draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
-    draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
+    # draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
+    # draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
 
     draw_text("Turn result: ", text_font, black, screen_width // 2 + 250, 150)
     draw_text(str(user1.get_turn_result()), text_font, black, screen_width // 2 + 350, 150)
 
-    draw_text("Cards in deck: ", text_font, black, screen_width // 2 - 350, 300)
-    draw_text(str(deck.get_deck_size()), text_font, black, screen_width // 2 - 250, 300)
+    # draw_text("Cards in deck: ", text_font, black, screen_width // 2 - 350, 300)
+    # draw_text(str(deck.get_deck_size()), text_font, black, screen_width // 2 - 250, 300)
 
     if user1.get_split_hand_result() is not None:
         draw_text("Your split cards are: ", text_font, black, 30, 475)
@@ -1670,7 +1672,7 @@ while running:
             onClick=clear_table
         )
 
-    deal_specific_cards_button.draw()
+    # deal_specific_cards_button.draw()
     one_dollar_chip.draw()
     five_dollar_chip.draw()
     twenty_five_dollar_chip.draw()
