@@ -15,6 +15,8 @@ import pygame.freetype
 
 #TO-DO: add animations
 
+#TO-DO: Fix hitbot on the refill bankroll button
+
 #BUG: If you double down and get blackjack, test that you get the right amount of chips back
 #BUG: If dealer gets two aces, only once ace is changed to 1, even if the third card busts them. - should be fixed now
 
@@ -958,7 +960,9 @@ def initial_score_check():
 
 
 def refill_bankroll():
+    print("Test1")
     user1.set_bankroll(1000)
+    print("Test")
 
 
 def clear_table():
@@ -1288,10 +1292,10 @@ refill_bankroll_button = Button(
     575,  # Y coordinate of the top-left corner
     125,
     25,
-    text='Refill Bank',
+    text='Refill Bank2',
     fontSize=20, margin=20,
-    inactiveColour=(255, 0, 0),
-    pressedColour=(0, 255, 0), radius=20,
+    inactiveColour=(0, 0, 255),
+    pressedColour=(255, 0, 0), radius=20,
     onClick=refill_bankroll
 )
 
