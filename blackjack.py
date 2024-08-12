@@ -10,8 +10,10 @@ import pygame.freetype
 
 # To try and embedd my game in browser: https://pygame-web.github.io/#demos-on-itchio
 
-# TO-DO: make sure aces behave correctly when two are dealt to the user at the start. they are both automatically
-# changed to a value of 1 each. This carries over if they are split.
+# TO-DO: add a counter over a split hand that shows how much money is riding on that hand. same for the counter of that
+# hand to show its value
+
+#TO-DO: add animations
 
 # TO-DO: add insurance.
 
