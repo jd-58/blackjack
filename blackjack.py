@@ -129,6 +129,14 @@ class Deck:
         """Returns the current size of the deck"""
         return len(self._cards)
 
+    def set_deck(self, new_deck):
+        """Sets the deck to whatever is specified"""
+        self._cards = new_deck
+
+    def duplicate_deck(self, times_to_duplicate):
+        """Duplicates the current deck a set number of times"""
+        self._cards = self._cards * times_to_duplicate
+
 
 class User:
     """Creates a user"""
@@ -410,6 +418,7 @@ class User:
         """Updates the amount of splits that have occurred during the turn. A positive amount adds a positive number
         to the total"""
         self._split_count_during_turn += amount
+
     def set_bankroll(self, new_amount):
         """Changes the user's bankroll to a specific amount."""
         self._bankroll = new_amount
@@ -475,17 +484,23 @@ class User:
         return self._amount_bet
 
 
+deck = Deck()  # The deck we will use for the game. This deck contains 6 decks.
+deck.duplicate_deck(6)  # 6 decks of cards are being used.
+
+
+
+
+
 user1 = User("jacob", 1000)
-deck = Deck()
-deck.shuffle_deck()
 pot = User("pot", 0)
 
 
 #  Need separate functions for each bet, since functions assigned to a button in pygame can't have parameters.
-
 def user_bet_zero():
     """Takes 100 chips out of the user's bankroll and adds it to the pot"""
     user1.set_are_cards_ready_to_be_drawn(True)
+
+
 def user_bet_one():
     """Takes 1 chip out of the user's bankroll and adds it to the pot"""
     if user1.get_can_user_bet() is True and user1.get_bankroll() >= 1:
@@ -505,9 +520,9 @@ def user_bet_five():
 def user_bet_twenty_five():
     """Takes 25 chips out of the user's bankroll and adds it to the pot"""
     if user1.get_bankroll() >= 25 and user1.get_can_user_bet() is True:
-            user1.update_bankroll(-25)
-            user1.update_amount_bet(25)
-            pot.update_bankroll(25)
+        user1.update_bankroll(-25)
+        user1.update_amount_bet(25)
+        pot.update_bankroll(25)
 
 
 def user_bet_one_hundred():
@@ -562,7 +577,7 @@ def show_user_card_image():
         final_image = load_string + image_file_name
         img = pygame.image.load(final_image)
         img = pygame.transform.scale(img, img_size)
-        screen.blit(img, (screen_width // 2 - 100 + (40*i), 500 + (3*i)))
+        screen.blit(img, (screen_width // 2 - 100 + (40 * i), 500 + (3 * i)))
         i += 1
 
 
@@ -584,8 +599,6 @@ def show_dealer_card_image():
             img = pygame.transform.scale(img, img_size)
             screen.blit(img, (screen_width // 2 - 100 + (40 * i), 100 + (3 * i)))
             i += 1
-
-
 
 
 def hit_specific_cards():
@@ -759,6 +772,7 @@ def clear_bets():
     pot.set_bankroll(0)
     user1.set_amount_bet(0)
     user1.set_are_cards_ready_to_be_drawn(False)
+
 
 def draw_specific_cards_button_func():  # This is for testing certain hand combinations and results
     # card1 = Card(11, 'ace', 'hearts', True)
@@ -1125,8 +1139,11 @@ def final_score_check():
 def is_turn_over():
     if user1.get_turn_result() != 'in-progress' and dealer.get_turn_result() != 'in-progress':
         return True
+
+
 # and user1.get_split_hand_result() != 'in-progress' and user1.get_split_hand_2_result() != 'in-progress'
 # and user1.get_split_hand_3_result() != 'in-progress':
+
 
 def ready_to_draw_cards_check():
     if pot.get_bankroll() > 0 and user1.get_hand() == []:
@@ -1194,8 +1211,6 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 clock = pygame.time.Clock()
 running = True
 
-
-
 double_down_button = Button(
     screen,
     screen_width // 2 + 100,  # X coordinate of the top-left corner
@@ -1247,8 +1262,6 @@ no_bet_button = Button(
     pressedColour=(0, 255, 0), radius=20,
     onClick=user_bet_zero
 )
-
-
 
 hit_specific_card_button = Button(
     screen,
@@ -1340,7 +1353,6 @@ one_thousand_dollar_chip = Button(
     pressedColour=(0, 255, 0), radius=20,
     onClick=user_bet_one_thousand
 )
-
 
 split_button = Button(
     screen,
@@ -1439,8 +1451,8 @@ while running:
     draw_text("Turn result: ", text_font, black, screen_width // 2 + 250, 150)
     draw_text(str(user1.get_turn_result()), text_font, black, screen_width // 2 + 350, 150)
 
-    # draw_text("Cards in deck: ", text_font, black, screen_width // 2 - 350, 300)
-    # draw_text(str(deck.get_deck_size()), text_font, black, screen_width // 2 - 250, 300)
+    draw_text("Cards in deck: ", text_font, black, screen_width // 2 - 350, 300)
+    draw_text(str(deck.get_deck_size()), text_font, black, screen_width // 2 - 250, 300)
 
     if user1.get_split_hand_result() is not None:
         draw_text("Your split cards are: ", text_font, black, 30, 475)
@@ -1452,7 +1464,7 @@ while running:
             final_image = load_string + image_file_name
             img = pygame.image.load(final_image)
             img = pygame.transform.scale(img, img_size)
-            screen.blit(img, (25+ (40 * i), 525 + (3 * i)))
+            screen.blit(img, (25 + (40 * i), 525 + (3 * i)))
             i += 1
 
         draw_text("Your split score: ", text_font, black, screen_width // 2 + 250, 525)
@@ -1657,7 +1669,6 @@ while running:
     if split_check() is True or split_check_2() is True or split_check_3() is True or split_check_4() is True:
         if user1.get_split_count_this_turn() < 3:
             split_button.draw()
-
 
     pygame.display.flip()
     pygame.display.update()
