@@ -17,6 +17,9 @@ import pygame.freetype
 
 #TO-DO: Fix hitbot on the refill bankroll button
 
+
+#BUG: Dealers cards go face up during two split hands (three total hands). need to check whats causing, and if chips
+# are properly being distributed.
 #BUG: If you double down and get blackjack, test that you get the right amount of chips back
 #BUG: If dealer gets two aces, only once ace is changed to 1, even if the third card busts them. - should be fixed now
 
@@ -935,6 +938,7 @@ def stand():
         return
     dealer_hand = dealer.get_hand()
     dealer_hand[1].set_face_up(True)
+    print("Dealer face up")
     check_to_change_ace(dealer)
     check_to_change_ace(dealer)
     while dealer.get_hand_value() <= 16:
