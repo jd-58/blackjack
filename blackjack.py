@@ -15,6 +15,8 @@ import pygame.freetype
 
 #TO-DO: add animations
 
+#BUG: If dealer gets two aces, only once ace is changed to 1, even if the third card busts them. - should be fixed now
+
 # TO-DO: add insurance.
 
 
@@ -775,17 +777,18 @@ def clear_bets():
 
 
 def draw_specific_cards_button_func():  # This is for testing certain hand combinations and results
-    # card1 = Card(11, 'ace', 'hearts', True)
-    # card2 = Card(11, 'ace', 'diamonds', False)
-    # new_hand1 = [card1, card2]
+    card1 = Card(11, 'ace', 'hearts', True)
+    card2 = Card(11, 'ace', 'diamonds', False)
+    new_hand1 = [card1, card2]
     user1.set_can_user_bet(False)
+    user1.draw_user_card(deck, 2, True)
     card3 = Card(11, 'ace', 'hearts', True)
     card4 = Card(1, 'ace', 'clubs', True)
-    # dealer.set_hand(new_hand1)
+    dealer.set_hand(new_hand1)
     new_hand2 = [card3, card4]
-    user1.set_hand(new_hand2)
-    dealer.draw_user_card(deck, 1, True)
-    dealer.draw_user_card(deck, 1, False)
+    # user1.set_hand(new_hand2)
+    # dealer.draw_user_card(deck, 1, True)
+    # dealer.draw_user_card(deck, 1, False)
     initial_score_check()
     is_double_down_possible()
     split_check()
@@ -889,8 +892,6 @@ def hit():
 
 
 def stand():
-    if pot.get_bankroll() == 0:
-        return "No bets placed"
     if user1.get_is_split_hand_3_active() is True:
         user1.set_is_split_hand_3_active(False)
         return
@@ -903,14 +904,17 @@ def stand():
     dealer_hand = dealer.get_hand()
     dealer_hand[1].set_face_up(True)
     check_to_change_ace(dealer)
+    check_to_change_ace(dealer)
     while dealer.get_hand_value() <= 16:
         dealer.draw_user_card(deck, 1, True)
+        check_to_change_ace(dealer)
         check_to_change_ace(dealer)
     final_score_check()
 
 
 def initial_score_check():
     check_to_change_ace(user1)
+    check_to_change_ace(dealer)
     if (user1.get_hand_value() > 21  # User busts
             or dealer.get_hand_value() == 21 and user1.get_hand_value != 21):  # Dealer gets natural blackjack
         dealer.set_turn_result('win')
@@ -928,10 +932,11 @@ def refill_bankroll():
 
 
 def clear_table():
-    if check_for_ace(user1) is True:
-        change_ace_value_to_11(user1)
-    if check_for_ace(dealer) is True:
-        change_ace_value_to_11(dealer)
+    change_ace_value_to_11_for_all_user_hands(user1.get_hand())
+    change_ace_value_to_11_for_all_user_hands(user1.get_split_hand())
+    change_ace_value_to_11_for_all_user_hands(user1.get_split_hand_2())
+    change_ace_value_to_11_for_all_user_hands(user1.get_split_hand_3())
+    change_ace_value_to_11_for_all_user_hands(dealer.get_hand())
     user1.set_turn_result('in-progress')
     user1.clear_hand()
     pot.set_bankroll(0)
@@ -1005,13 +1010,22 @@ def change_ace_value_to_11(user):
             card.set_has_value_changed(False)
             card.set_value(11)
 
+def change_ace_value_to_11_for_all_user_hands(hand):
+    for item in hand:
+        if item.get_name() == 'ace':
+            item.set_has_value_changed(False)
+            item. set_value(11)
 
 def change_ace_value_to_1(user):
     user_hand = user.get_hand()
     for card in user_hand:
-        if card.get_name() == 'ace':
+        if card.get_name() == 'ace' and card.get_has_value_changed() is False and user.get_hand_value() > 21:
+            print(card.get_name_and_suit())
+            print(card.get_value())
             card.set_value(1)
-            return
+            card.set_has_value_changed(True)
+            print("Card: ", card.get_name_and_suit(), "has been changed to ", card.get_value)
+
 
 
 def check_for_ace_to_change(user):
@@ -1104,8 +1118,10 @@ def split_hand_3_score_check():
 
 
 def check_to_change_ace(user):
-    if user.get_hand_value() > 21 and check_for_ace(user) is True:
+    if user.get_hand_value() > 21: # and check_for_ace(user) is True:
         change_ace_value_to_1(user)
+        change_ace_value_to_1(user)
+        print("Card changed")
         return
 
 
@@ -1445,8 +1461,8 @@ while running:
     draw_text("Pot: ", text_font, black, screen_width // 2 - 25, 300)
     draw_text(str(pot.get_bankroll()), text_font, black, screen_width // 2 + 25, 300)
 
-    # draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
-    # draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
+    draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
+    draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
 
     draw_text("Turn result: ", text_font, black, screen_width // 2 + 250, 150)
     draw_text(str(user1.get_turn_result()), text_font, black, screen_width // 2 + 350, 150)
@@ -1654,7 +1670,7 @@ while running:
             onClick=clear_table
         )
 
-    # deal_specific_cards_button.draw()
+    deal_specific_cards_button.draw()
     one_dollar_chip.draw()
     five_dollar_chip.draw()
     twenty_five_dollar_chip.draw()
@@ -1676,7 +1692,11 @@ while running:
     # check_dealer_score()
     turn_over_check()
 
+
+
     pw.update(events)
     clock.tick(30)
+
+
 
 pygame.quit()
