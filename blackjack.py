@@ -27,7 +27,7 @@ class Card:
         self._name = str(name)
         self._name_and_suit = str(name) + "_" + str(self._suit)
         self._has_value_changed = has_value_changed
-        self._image = self._name_and_suit + '.png'
+        self._image = self._name_and_suit + '_white.png'
 
     def get_card(self):
         """Returns the string card value and then suit"""
@@ -153,7 +153,8 @@ class User:
         self._split_hand_result = None
         self._split_hand_2_result = None
         self._split_hand_3_result = None
-        self._illegal_action = False
+        self._cards_ready_to_be_drawn = True
+        self._split_count_during_turn = 0
 
     def draw_user_card(self, game_deck, number_of_cards, is_face_up=True):
         """Adds a specified number of cards to the user's hand from the deck."""
@@ -203,6 +204,10 @@ class User:
         """Returns the result of the 2nd split hand. Is None if a split hand is not active"""
         return self._split_hand_2_result
 
+    def get_split_count_this_turn(self):
+        """Returns the number of times a split has occurred this turn"""
+        return self._split_count_during_turn
+
     def get_split_hand_3_result(self):
         """Returns the result of the 3rd split hand. Is None if a split hand is not active"""
         return self._split_hand_3_result
@@ -210,6 +215,10 @@ class User:
     def get_is_split_hand_active(self):
         """Returns False if a split hand is not active, and True if it is"""
         return self._is_split_hand_active
+
+    def get_are_cards_ready_to_be_drawn(self):
+        """Returns True if cards are ready to be dealt, False if not"""
+        return self._cards_ready_to_be_drawn
 
     def get_is_split_hand_2_active(self):
         """Returns False if 2nd split hand is not active, and True if it is"""
@@ -294,6 +303,14 @@ class User:
     def set_username(self, new_username):
         """Changes the user's username"""
         self._username = new_username
+
+    def set_are_cards_ready_to_be_drawn(self, new_condition):
+        """True if cards are ready to be drawn, False if not. Changes this value."""
+        self._cards_ready_to_be_drawn = new_condition
+
+    def set_split_count_during_turn(self, new_amount):
+        """Sets the amount of splits that have occurred during the current turn to a new amount"""
+        self._split_count_during_turn = new_amount
 
     def set_is_split_hand_active(self, new_condition):
         """Changes whether a split hand is active"""
@@ -387,6 +404,10 @@ class User:
         """Changes the user's bankroll by the desired amount. A negative number lowers the bankroll"""
         self._bankroll += amount_to_add
 
+    def update_split_count_during_turn(self, amount):
+        """Updates the amount of splits that have occurred during the turn. A positive amount adds a positive number
+        to the total"""
+        self._split_count_during_turn += amount
     def set_bankroll(self, new_amount):
         """Changes the user's bankroll to a specific amount."""
         self._bankroll = new_amount
@@ -459,6 +480,10 @@ pot = User("pot", 0)
 
 
 #  Need separate functions for each bet, since functions assigned to a button in pygame can't have parameters.
+
+def user_bet_zero():
+    """Takes 100 chips out of the user's bankroll and adds it to the pot"""
+    user1.set_are_cards_ready_to_be_drawn(True)
 def user_bet_one():
     """Takes 1 chip out of the user's bankroll and adds it to the pot"""
     if user1.get_can_user_bet() is True and user1.get_bankroll() >= 1:
@@ -522,6 +547,43 @@ def draw_cards_button_func():
     initial_score_check()
     is_double_down_possible()
     split_check()
+    user1.set_are_cards_ready_to_be_drawn(False)
+
+
+def show_user_card_image():
+    user_hand = user1.get_hand()
+    i = 0
+    for card in user_hand:
+        image_file_name = card.get_image()
+        img_size = (120, 168)  # Original size: 60x84
+        load_string = "images/cards/all_cards/"
+        final_image = load_string + image_file_name
+        img = pygame.image.load(final_image)
+        img = pygame.transform.scale(img, img_size)
+        screen.blit(img, (screen_width // 2 - 100 + (40*i), 500 + (3*i)))
+        i += 1
+
+
+def show_dealer_card_image():
+    dealer_hand = dealer.get_hand()
+    i = 0
+    for card in dealer_hand:
+        img_size = (120, 168)  # Original size: 60x84
+        if card.get_face_up() is True:
+            image_file_name = card.get_image()
+            load_string = "images/cards/all_cards/"
+            final_image = load_string + image_file_name
+            img = pygame.image.load(final_image)
+            img = pygame.transform.scale(img, img_size)
+            screen.blit(img, (screen_width // 2 - 100 + (40 * i), 100 + (3 * i)))
+            i += 1
+        if card.get_face_up() is False:
+            img = pygame.image.load('images/cards/all_cards/back_blue_basic_white.png')
+            img = pygame.transform.scale(img, img_size)
+            screen.blit(img, (screen_width // 2 - 100 + (40 * i), 100 + (3 * i)))
+            i += 1
+
+
 
 
 def hit_specific_cards():
@@ -625,10 +687,6 @@ def double_down():
 
 def split_cards():
     """Splits the user's cards if split_check returns true."""
-    print("split check 4:", split_check_4())
-    print("split check 3:", split_check_3())
-    print("split check 2:", split_check_2())
-    print("split check 1:", split_check())
     if split_check_3() is True:
         user1.set_split_hand_3_result('in-progress')
         user_hand_to_split = user1.get_split_hand_2()
@@ -640,8 +698,18 @@ def split_cards():
         user1.update_amount_bet_on_split_2(user1.get_amount_bet_on_split())
         user1.update_bankroll(-user1.get_amount_bet_on_split())
         pot.update_bankroll(user1.get_amount_bet_on_split_2())
+        i = 0
+        for card in user1.get_split_hand_3():
+            image_file_name = card.get_image()
+            img_size = (120, 168)  # Original size: 60x84
+            load_string = "images/cards/all_cards/"
+            final_image = load_string + image_file_name
+            img = pygame.image.load(final_image)
+            img = pygame.transform.scale(img, img_size)
+            screen.blit(img, (screen_width // 2 - 400 + (40 * i), 500 + (3 * i)))
         user1.set_is_split_hand_3_active(True)
         del user_hand_to_split[0]
+        user1.update_split_count_during_turn(1)
         return
     if split_check_2() is True:
         user1.set_split_hand_2_result('in-progress')
@@ -654,8 +722,18 @@ def split_cards():
         user1.update_amount_bet_on_split_2(user1.get_amount_bet_on_split())
         user1.update_bankroll(-user1.get_amount_bet_on_split())
         pot.update_bankroll(user1.get_amount_bet_on_split_2())
+        i = 0
+        for card in user1.get_split_hand_2():
+            image_file_name = card.get_image()
+            img_size = (120, 168)  # Original size: 60x84
+            load_string = "images/cards/all_cards/"
+            final_image = load_string + image_file_name
+            img = pygame.image.load(final_image)
+            img = pygame.transform.scale(img, img_size)
+            screen.blit(img, (screen_width // 2 - 400 + (40 * i), 500 + (3 * i)))
         user1.set_is_split_hand_2_active(True)
         del user_hand_to_split[0]
+        user1.update_split_count_during_turn(1)
         return
     if split_check() is True:
         user1.set_split_hand_result('in-progress')
@@ -670,6 +748,7 @@ def split_cards():
         pot.update_bankroll(user1.get_amount_bet_on_split())
         user1.set_is_split_hand_active(True)
         del user_hand[0]
+        user1.update_split_count_during_turn(1)
         return
 
 
@@ -726,9 +805,9 @@ def hit():
 
     if user1.get_is_split_hand_2_active() is True:
         user1.draw_user_card_to_split_hand_2(deck, 1, True)
-        # specific_card = Card(7, '7', 'clubs', True) # For testing only
+        # specific_card = Card(11, 'ace', 'clubs', True) # For testing only
         user_split_hand2 = user1.get_split_hand_2()
-        # user_split_hand2.append(specific_card) # For testing only
+        # user_split_hand2.append(specific_card)  # For testing only
         ace_needs_to_change = False
         for card in user_split_hand2:
             if card.get_name() == 'ace' and card.get_has_value_changed() is False:
@@ -747,9 +826,9 @@ def hit():
 
     if user1.get_is_split_hand_active() is True:
         user1.draw_user_card_to_split_hand(deck, 1, True)
-        # specific_card = Card(7, '7', 'clubs', True) # For testing only
+        # specific_card = Card(11, 'ace', 'clubs', True) # For testing only
         user_split_hand = user1.get_split_hand()
-        # user_split_hand.append(specific_card) # For testing only
+        # user_split_hand.append(specific_card)  # For testing only
         ace_needs_to_change = False
         for card in user_split_hand:
             if card.get_name() == 'ace' and card.get_has_value_changed() is False:
@@ -1035,6 +1114,17 @@ def final_score_check():
     return
 
 
+def is_turn_over():
+    if user1.get_turn_result() != 'in-progress' and dealer.get_turn_result() != 'in-progress':
+        return True
+# and user1.get_split_hand_result() != 'in-progress' and user1.get_split_hand_2_result() != 'in-progress'
+# and user1.get_split_hand_3_result() != 'in-progress':
+
+def ready_to_draw_cards_check():
+    if pot.get_bankroll() > 0 and user1.get_hand() == []:
+        user1.set_are_cards_ready_to_be_drawn(True)
+
+
 def distribute_chips_from_pot():
     if user1.get_split_hand_result() is not None:
         if user1.get_split_hand_result() == 'win' or user1.get_split_hand_result() == 'blackjack':
@@ -1089,7 +1179,6 @@ def distribute_chips_from_pot():
         user1.set_amount_bet(0)
 
 
-
 pygame.init()
 screen_width = 1280
 screen_height = 720
@@ -1097,18 +1186,7 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 clock = pygame.time.Clock()
 running = True
 
-deal_cards_button = Button(
-    screen,
-    screen_width // 2 - 50,  # X coordinate of the top-left corner
-    400,  # Y coordinate of the top-left corner
-    125,
-    25,
-    text='Draw cards',
-    fontSize=20, margin=20,
-    inactiveColour=(255, 0, 0),
-    pressedColour=(0, 255, 0), radius=20,
-    onClick=draw_cards_button_func
-)
+
 
 double_down_button = Button(
     screen,
@@ -1149,18 +1227,20 @@ refill_bankroll_button = Button(
     onClick=refill_bankroll
 )
 
-hit_button = Button(
+no_bet_button = Button(
     screen,
-    screen_width // 2 + 350,  # X coordinate of the top-left corner
-    400,  # Y coordinate of the top-left corner
-    75,
+    screen_width // 2 + 420,  # X coordinate of the top-left corner
+    575,  # Y coordinate of the top-left corner
+    125,
     25,
-    text='Hit',
+    text='Pass',
     fontSize=20, margin=20,
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
-    onClick=hit
+    onClick=user_bet_zero
 )
+
+
 
 hit_specific_card_button = Button(
     screen,
@@ -1253,18 +1333,6 @@ one_thousand_dollar_chip = Button(
     onClick=user_bet_one_thousand
 )
 
-stand_button = Button(
-    screen,
-    screen_width // 2 + 500,  # X coordinate of the top-left corner
-    400,  # Y coordinate of the top-left corner
-    75,
-    25,
-    text='Stand',
-    fontSize=20, margin=20,
-    inactiveColour=(255, 0, 0),
-    pressedColour=(0, 255, 0), radius=20,
-    onClick=stand
-)
 
 split_button = Button(
     screen,
@@ -1279,13 +1347,13 @@ split_button = Button(
     onClick=split_cards
 )
 
-clear_button = Button(  # TEMPORARY BUTTON
+new_turn_button = Button(
     screen,
-    screen_width // 2 - 500,  # X coordinate of the top-left corner
-    400,  # Y coordinate of the top-left corner
-    75,
+    screen_width // 2 + 350,  # X coordinate of the top-left corner
+    450,  # Y coordinate of the top-left corner
+    125,
     25,
-    text='Clear',
+    text='New Turn',
     fontSize=20, margin=20,
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
@@ -1340,8 +1408,9 @@ while running:
     # Game code here
     screen.fill("green")
 
-    draw_text("Your cards are: ", text_font, black, screen_width // 2 - 25, 550)
-    draw_text(str(user1.show_hand()), text_font, black, screen_width // 2 - 25, 600)
+    if user1.get_hand():
+        draw_text("Your cards are: ", text_font, black, screen_width // 2 - 80, 475)
+    # draw_text(str(user1.show_hand()), text_font, black, screen_width // 2 - 25, 600)
 
     draw_text("Your score: ", text_font, black, screen_width // 2 + 250, 550)
     draw_text(str(user1.get_hand_value()), text_font, black, screen_width // 2 + 350, 550)
@@ -1349,8 +1418,9 @@ while running:
     draw_text("Chips: ", text_font, black, screen_width // 2 + 450, 550)
     draw_text(str(user1.get_bankroll()), text_font, black, screen_width // 2 + 500, 550)
 
-    draw_text("Dealer's cards are: ", text_font, black, screen_width // 2 - 25, 100)
-    draw_text(str(dealer.show_hand()), text_font, black, screen_width // 2 - 25, 150)
+    if dealer.get_hand():
+        draw_text("Dealer's cards are: ", text_font, black, screen_width // 2 - 80, 70)
+    # draw_text(str(dealer.show_hand()), text_font, black, screen_width // 2 - 25, 150)
 
     draw_text("Pot: ", text_font, black, screen_width // 2 - 25, 300)
     draw_text(str(pot.get_bankroll()), text_font, black, screen_width // 2 + 25, 300)
@@ -1358,25 +1428,43 @@ while running:
     # draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
     # draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
 
-    draw_text("Turn result: ", text_font, black, screen_width // 2 - 350, 100)
-    draw_text(str(user1.get_turn_result()), text_font, black, screen_width // 2 - 250, 100)
+    draw_text("Turn result: ", text_font, black, screen_width // 2 + 250, 150)
+    draw_text(str(user1.get_turn_result()), text_font, black, screen_width // 2 + 350, 150)
 
-    draw_text("Cards in deck: ", text_font, black, screen_width // 2 - 350, 300)
-    draw_text(str(deck.get_deck_size()), text_font, black, screen_width // 2 - 250, 300)
+    # draw_text("Cards in deck: ", text_font, black, screen_width // 2 - 350, 300)
+    # draw_text(str(deck.get_deck_size()), text_font, black, screen_width // 2 - 250, 300)
 
     if user1.get_split_hand_result() is not None:
-        draw_text("Your split cards are: ", text_font, black, screen_width // 2 - 325, 550)
-        draw_text(str(user1.show_split_hand()), text_font, black, screen_width // 2 - 325, 600)
+        draw_text("Your split cards are: ", text_font, black, 30, 475)
+        i = 0
+        for card in user1.get_split_hand():
+            image_file_name = card.get_image()
+            img_size = (120, 168)  # Original size: 60x84
+            load_string = "images/cards/all_cards/"
+            final_image = load_string + image_file_name
+            img = pygame.image.load(final_image)
+            img = pygame.transform.scale(img, img_size)
+            screen.blit(img, (25+ (40 * i), 525 + (3 * i)))
+            i += 1
 
         draw_text("Your split score: ", text_font, black, screen_width // 2 + 250, 525)
         draw_text(str(user1.get_split_hand_value()), text_font, black, screen_width // 2 + 350, 525)
 
-        draw_text("Split hand result: ", text_font, black, screen_width // 2 + 250, 100)
-        draw_text(str(user1.get_split_hand_result()), text_font, black, screen_width // 2 + 400, 100)
+        draw_text("Split hand result: ", text_font, black, screen_width // 2 + 250, 300)
+        draw_text(str(user1.get_split_hand_result()), text_font, black, screen_width // 2 + 400, 300)
 
     if user1.get_split_hand_2_result() is not None:
-        draw_text("Your 2nd split cards are: ", text_font, black, screen_width // 2 - 400, 450)
-        draw_text(str(user1.show_split_hand_2()), text_font, black, screen_width // 2 - 400, 500)
+        draw_text("Your 2nd split cards are: ", text_font, black, 30, 250)
+        i = 0
+        for card in user1.get_split_hand_2():
+            image_file_name = card.get_image()
+            img_size = (120, 168)  # Original size: 60x84
+            load_string = "images/cards/all_cards/"
+            final_image = load_string + image_file_name
+            img = pygame.image.load(final_image)
+            img = pygame.transform.scale(img, img_size)
+            screen.blit(img, (25 + (40 * i), 275 + (3 * i)))
+            i += 1
 
         draw_text("Your 2nd split score: ", text_font, black, screen_width // 2 + 250, 500)
         draw_text(str(user1.get_split_hand_2_value()), text_font, black, screen_width // 2 + 400, 500)
@@ -1385,8 +1473,17 @@ while running:
         draw_text(str(user1.get_split_hand_2_result()), text_font, black, screen_width // 2 + 400, 125)
 
     if user1.get_split_hand_3_result() is not None:
-        draw_text("Your 3rd split cards are: ", text_font, black, screen_width // 2 - 500, 650)
-        draw_text(str(user1.show_split_hand_3()), text_font, black, screen_width // 2 - 500, 675)
+        draw_text("Your 3rd split cards are: ", text_font, black, 25, 25)
+        i = 0
+        for card in user1.get_split_hand_3():
+            image_file_name = card.get_image()
+            img_size = (120, 168)  # Original size: 60x84
+            load_string = "images/cards/all_cards/"
+            final_image = load_string + image_file_name
+            img = pygame.image.load(final_image)
+            img = pygame.transform.scale(img, img_size)
+            screen.blit(img, (25 + (40 * i), 50 + (3 * i)))
+            i += 1
 
         draw_text("Your 3rd split score: ", text_font, black, screen_width // 2 + 250, 475)
         draw_text(str(user1.get_split_hand_3_value()), text_font, black, screen_width // 2 + 400, 475)
@@ -1395,14 +1492,123 @@ while running:
         draw_text(str(user1.get_split_hand_3_result()), text_font, black, screen_width // 2 + 400, 150)
 
     if user1.get_can_user_bet() is True:
-        draw_text("Place your bets!", big_text_font, black, screen_width // 2 - 100, 450)
+        draw_text("Place your bets!", big_text_font, black, screen_width // 2 - 100, 350)
 
+    ready_to_draw_cards_check()
+    show_user_card_image()
+    show_dealer_card_image()
 
-    deal_cards_button.draw()
-    hit_button.draw()
-    stand_button.draw()
-    clear_button.draw()
-    deal_specific_cards_button.draw()
+    if user1.get_are_cards_ready_to_be_drawn() is True:
+        deal_cards_button = Button(
+            screen,
+            screen_width // 2 - 50,  # X coordinate of the top-left corner
+            400,  # Y coordinate of the top-left corner
+            125,
+            25,
+            text='Draw cards',
+            fontSize=20, margin=20,
+            inactiveColour=(255, 0, 0),
+            pressedColour=(0, 255, 0), radius=20,
+            onClick=draw_cards_button_func
+        )
+        deal_cards_button.draw()
+    else:
+        deal_cards_button = Button(
+            screen,
+            screen_width // 2 - 55550,  # X coordinate of the top-left corner
+            400,  # Y coordinate of the top-left corner
+            125,
+            25,
+            text='Draw cards',
+            fontSize=20, margin=20,
+            inactiveColour=(255, 0, 0),
+            pressedColour=(0, 255, 0), radius=20,
+            onClick=draw_cards_button_func
+        )
+
+    if user1.get_hand() and user1.get_turn_result() == 'in-progress':
+        hit_button = Button(
+            screen,
+            screen_width // 2 + 350,  # X coordinate of the top-left corner
+            400,  # Y coordinate of the top-left corner
+            75,
+            25,
+            text='Hit',
+            fontSize=20, margin=20,
+            inactiveColour=(255, 0, 0),
+            pressedColour=(0, 255, 0), radius=20,
+            onClick=hit
+        )
+        stand_button = Button(
+            screen,
+            screen_width // 2 + 500,  # X coordinate of the top-left corner
+            400,  # Y coordinate of the top-left corner
+            75,
+            25,
+            text='Stand',
+            fontSize=20, margin=20,
+            inactiveColour=(255, 0, 0),
+            pressedColour=(0, 255, 0), radius=20,
+            onClick=stand
+        )
+        hit_button.draw()
+        stand_button.draw()
+    else:
+        hit_button = Button(
+            screen,
+            screen_width // 2 + 55350,  # X coordinate of the top-left corner
+            400,  # Y coordinate of the top-left corner
+            75,
+            25,
+            text='Hit',
+            fontSize=20, margin=20,
+            inactiveColour=(255, 0, 0),
+            pressedColour=(0, 255, 0), radius=20,
+            onClick=hit
+        )
+        stand_button = Button(
+            screen,
+            screen_width // 2 + 55500,  # X coordinate of the top-left corner
+            400,  # Y coordinate of the top-left corner
+            75,
+            25,
+            text='Stand',
+            fontSize=20, margin=20,
+            inactiveColour=(255, 0, 0),
+            pressedColour=(0, 255, 0), radius=20,
+            onClick=stand
+        )
+    if is_turn_over() is True:
+        new_turn_button = Button(
+            screen,
+            screen_width // 2 + 350,  # X coordinate of the top-left corner
+            450,  # Y coordinate of the top-left corner
+            125,
+            25,
+            text='New Turn',
+            fontSize=20, margin=20,
+            inactiveColour=(255, 0, 0),
+            pressedColour=(0, 255, 0), radius=20,
+            onClick=clear_table
+        )
+        new_turn_button.draw()
+        draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
+        draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
+    else:
+        new_turn_button = Button(
+            screen,
+            screen_width // 2 + 44350,  # X coordinate of the top-left corner
+            450,  # Y coordinate of the top-left corner
+            125,
+            25,
+            text='New Turn',
+            fontSize=20, margin=20,
+            inactiveColour=(255, 0, 0),
+            pressedColour=(0, 255, 0), radius=20,
+            onClick=clear_table
+        )
+
+    # deal_specific_cards_button.draw()
     one_dollar_chip.draw()
     five_dollar_chip.draw()
     twenty_five_dollar_chip.draw()
@@ -1414,9 +1620,11 @@ while running:
     if is_double_down_possible() is True:
         double_down_button.draw()
 
-    if (split_check() or split_check_2() or split_check_3() or split_check_4() is True
-            and user1.get_split_hand_3() is None):
-        split_button.draw()
+    if split_check() is True or split_check_2() is True or split_check_3() is True or split_check_4() is True:
+        if user1.get_split_count_this_turn() < 3:
+            print("Test")
+            split_button.draw()
+
 
     pygame.display.flip()
     pygame.display.update()
