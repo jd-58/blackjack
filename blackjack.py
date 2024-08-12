@@ -679,7 +679,8 @@ def is_double_down_possible():
             return False
     user_hand = user1.get_hand()
     if len(user_hand) == 2 and 8 < user1.get_hand_value() < 12:
-        return True
+        if user1.get_turn_result() == 'in-progress':
+            return True
     else:
         return False
 
