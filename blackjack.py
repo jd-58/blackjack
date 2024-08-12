@@ -15,6 +15,7 @@ import pygame.freetype
 
 #TO-DO: add animations
 
+#BUG: If you double down and get blackjack, test that you get the right amount of chips back
 #BUG: If dealer gets two aces, only once ace is changed to 1, even if the third card busts them. - should be fixed now
 
 # TO-DO: add insurance.
@@ -693,6 +694,22 @@ def double_down():
             # Should be face down, update later
             stand()
             return
+        if user1.get_is_split_hand_2_active() is True:
+            pot.update_bankroll(user1.get_amount_bet_on_split_2())
+            user1.update_bankroll(-user1.get_amount_bet_on_split_2())
+            user1.update_amount_bet_on_split(user1.get_amount_bet_on_split_2())
+            user1.draw_user_card_to_split_hand_2(deck, 1, True)
+            # Should be face down, update later
+            stand()
+            return
+        if user1.get_is_split_hand_3_active() is True:
+            pot.update_bankroll(user1.get_amount_bet_on_split_3())
+            user1.update_bankroll(-user1.get_amount_bet_on_split_3())
+            user1.update_amount_bet_on_split(user1.get_amount_bet_on_split_3())
+            user1.draw_user_card_to_split_hand_3(deck, 1, True)
+            # Should be face down, update later
+            stand()
+            return
         pot.update_bankroll(user1.get_amount_bet())
         user1.update_bankroll(-user1.get_amount_bet())
         user1.update_amount_bet(user1.get_amount_bet())
@@ -727,6 +744,10 @@ def split_cards():
         user1.set_is_split_hand_3_active(True)
         del user_hand_to_split[0]
         user1.update_split_count_during_turn(1)
+        for card in user1.get_split_hand_3():
+            if card.get_name() == 'ace':
+                hit()
+                stand()
         return
     if split_check_2() is True:
         user1.set_split_hand_2_result('in-progress')
@@ -751,6 +772,10 @@ def split_cards():
         user1.set_is_split_hand_2_active(True)
         del user_hand_to_split[0]
         user1.update_split_count_during_turn(1)
+        for card in user1.get_split_hand_2():
+            if card.get_name() == 'ace':
+                hit()
+                stand()
         return
     if split_check() is True:
         user1.set_split_hand_result('in-progress')
@@ -766,6 +791,10 @@ def split_cards():
         user1.set_is_split_hand_active(True)
         del user_hand[0]
         user1.update_split_count_during_turn(1)
+        for card2 in user1.get_split_hand():
+            if card2.get_name() == 'ace':
+                hit()
+                stand()
         return
 
 
@@ -1022,11 +1051,10 @@ def change_ace_value_to_1(user):
     user_hand = user.get_hand()
     for card in user_hand:
         if card.get_name() == 'ace' and card.get_has_value_changed() is False and user.get_hand_value() > 21:
-            print(card.get_name_and_suit())
-            print(card.get_value())
+
             card.set_value(1)
             card.set_has_value_changed(True)
-            print("Card: ", card.get_name_and_suit(), "has been changed to ", card.get_value)
+
 
 
 
@@ -1120,10 +1148,8 @@ def split_hand_3_score_check():
 
 
 def check_to_change_ace(user):
-    if user.get_hand_value() > 21: # and check_for_ace(user) is True:
+    if user.get_hand_value() > 21 and check_for_ace(user) is True:
         change_ace_value_to_1(user)
-        change_ace_value_to_1(user)
-        print("Card changed")
         return
 
 
