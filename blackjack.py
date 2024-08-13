@@ -1471,7 +1471,7 @@ new_game_button = Button(
 
 new_turn_button = Button(
     screen,
-    screen_width // 2 + 350,  # X coordinate of the top-left corner
+    screen_width // 2 + 275,  # X coordinate of the top-left corner
     450,  # Y coordinate of the top-left corner
     125,
     25,
