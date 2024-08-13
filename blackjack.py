@@ -149,7 +149,7 @@ class Deck:
 class User:
     """Creates a user"""
 
-    def __init__(self, username, bankroll=0, amount_bet=0):
+    def __init__(self, username=None, bankroll=0, amount_bet=0):
         """Initializes a user object with a given username and empty hand"""
         self._username = username
         self._hand = []
@@ -496,7 +496,7 @@ deck = Deck()  # The deck we will use for the game. This deck contains 6 decks.
 deck.duplicate_deck(6)  # 6 decks of cards are being used.
 
 
-user1 = User("jacob", 1000)
+user1 = User(bankroll=1000)
 pot = User("pot", 0)
 
 
@@ -1270,6 +1270,9 @@ def distribute_chips_from_pot():
         pot.set_bankroll(0)
         user1.set_amount_bet(0)
 
+def update_username():
+    text_entered = str(username_textbox.getText())
+    user1.set_username(text_entered)
 
 pygame.init()
 screen_width = 1280
@@ -1277,6 +1280,10 @@ screen_height = 720
 screen = pygame.display.set_mode((screen_width, screen_height))
 clock = pygame.time.Clock()
 running = True
+
+username_textbox = TextBox(screen, screen_width // 2 - 175, 500, 300, 50, fontSize=20,
+                  borderColour=(255, 0, 0), textColour=(0, 200, 0),
+                  onSubmit=update_username, radius=10, borderThickness=5)
 
 double_down_button = Button(
     screen,
@@ -1355,6 +1362,8 @@ one_dollar_chip = Button(
     pressedColour=(0, 255, 0), radius=20,
     onClick=user_bet_one
 )
+
+
 
 five_dollar_chip = Button(
     screen,
@@ -1760,6 +1769,9 @@ while running:
         one_thousand_dollar_chip.draw()
         # refill_bankroll_button.draw()
         all_in_button.draw()
+        if user1.get_username() is None:
+            draw_text("Enter username", big_text_font, black, screen_width // 2 - 120, 450)
+            username_textbox.draw()
 
     if is_double_down_possible() is True:
         double_down_button.draw()
