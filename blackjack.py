@@ -15,10 +15,10 @@ import pygame.freetype
 
 #TO-DO: add animations
 
-#TO-DO: Fix hitbot on the refill bankroll button
+#TO-DO: Fix hit-box on the refill bankroll button
 
 
-#BUG: Dealers cards go face up during two split hands (three total hands). need to check whats causing, and if chips
+#BUG: Dealers cards go face up during two split hands (three total hands). need to check what's causing, and if chips
 # are properly being distributed.
 #BUG: If you double down and get blackjack, test that you get the right amount of chips back
 #BUG: If dealer gets two aces, only once ace is changed to 1, even if the third card busts them. - should be fixed now
@@ -557,6 +557,15 @@ def user_bet_one_thousand():
         pot.update_bankroll(1000)
 
 
+def user_bet_all_in():
+    """Takes all chips out of the user's bankroll and adds it to the pot"""
+    if user1.get_can_user_bet() is True:
+        user_bankroll = user1.get_bankroll()
+        user1.update_amount_bet(user_bankroll)
+        pot.update_bankroll(user_bankroll)
+        user1.update_bankroll(-user_bankroll)
+
+
 dealer = User("Dealer")
 
 blackjack = 21
@@ -938,7 +947,6 @@ def stand():
         return
     dealer_hand = dealer.get_hand()
     dealer_hand[1].set_face_up(True)
-    print("Dealer face up")
     check_to_change_ace(dealer)
     check_to_change_ace(dealer)
     while dealer.get_hand_value() <= 16:
@@ -964,9 +972,15 @@ def initial_score_check():
 
 
 def refill_bankroll():
-    print("Test1")
     user1.set_bankroll(1000)
-    print("Test")
+
+
+def game_over_check():
+    if user1.get_turn_result() == 'loss':
+        if user1.get_bankroll() == 0:
+            return True
+        else:
+            return False
 
 
 def clear_table():
@@ -1065,6 +1079,9 @@ def change_ace_value_to_1(user):
             card.set_has_value_changed(True)
 
 
+def new_game():
+    clear_table()
+    user1.set_bankroll(1000)
 
 
 def check_for_ace_to_change(user):
@@ -1407,6 +1424,19 @@ one_thousand_dollar_chip = Button(
     onClick=user_bet_one_thousand
 )
 
+all_in_button = Button(
+    screen,
+    screen_width // 2 + 550,  # X coordinate of the top-left corner
+    650,  # Y coordinate of the top-left corner
+    75,
+    25,
+    text='All In',
+    fontSize=16, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    onClick=user_bet_one_thousand
+)
+
 split_button = Button(
     screen,
     screen_width // 2 - 50,  # X coordinate of the top-left corner
@@ -1418,6 +1448,19 @@ split_button = Button(
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
     onClick=split_cards
+)
+
+new_game_button = Button(
+    screen,
+    screen_width // 2 - 87,  # X coordinate of the top-left corner
+    400,  # Y coordinate of the top-left corner
+    174,
+    25,
+    text='New Game',
+    fontSize=24, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+    onClick=new_game
 )
 
 new_turn_button = Button(
@@ -1677,7 +1720,7 @@ while running:
             pressedColour=(0, 255, 0), radius=20,
             onClick=stand
         )
-    if is_turn_over() is True:
+    if is_turn_over() is True and game_over_check() is not True:
         new_turn_button = Button(
             screen,
             screen_width // 2 + 350,  # X coordinate of the top-left corner
@@ -1707,14 +1750,16 @@ while running:
             onClick=clear_table
         )
 
-    # deal_specific_cards_button.draw()
-    one_dollar_chip.draw()
-    five_dollar_chip.draw()
-    twenty_five_dollar_chip.draw()
-    one_hundred_dollar_chip.draw()
-    five_hundred_dollar_chip.draw()
-    one_thousand_dollar_chip.draw()
-    refill_bankroll_button.draw()
+    if game_over_check() is not True:
+        # deal_specific_cards_button.draw()
+        one_dollar_chip.draw()
+        five_dollar_chip.draw()
+        twenty_five_dollar_chip.draw()
+        one_hundred_dollar_chip.draw()
+        five_hundred_dollar_chip.draw()
+        one_thousand_dollar_chip.draw()
+        # refill_bankroll_button.draw()
+        all_in_button.draw()
 
     if is_double_down_possible() is True:
         double_down_button.draw()
@@ -1722,6 +1767,11 @@ while running:
     if split_check() is True or split_check_2() is True or split_check_3() is True or split_check_4() is True:
         if user1.get_split_count_this_turn() < 3:
             split_button.draw()
+
+    if game_over_check() is True:
+        new_game_button.draw()
+        draw_text("Game Over", big_text_font, black, screen_width // 2 - 75, 350)
+
 
     pygame.display.flip()
     pygame.display.update()
