@@ -15,7 +15,7 @@ import pygame.freetype
 
 #TO-DO: add animations
 
-#TO-DO: Fix hit-box on the refill bankroll button
+#TO-DO: Add title screen, music, make look better
 
 
 #BUG: Dealers cards go face up during two split hands (three total hands). need to check what's causing, and if chips
@@ -494,9 +494,6 @@ class User:
 
 deck = Deck()  # The deck we will use for the game. This deck contains 6 decks.
 deck.duplicate_deck(6)  # 6 decks of cards are being used.
-
-
-
 
 
 user1 = User("jacob", 1000)
@@ -1528,8 +1525,10 @@ while running:
         draw_text("Your cards are: ", text_font, black, screen_width // 2 - 80, 475)
     # draw_text(str(user1.show_hand()), text_font, black, screen_width // 2 - 25, 600)
 
-    draw_text("Your score: ", text_font, black, screen_width // 2 + 250, 550)
-    draw_text(str(user1.get_hand_value()), text_font, black, screen_width // 2 + 350, 550)
+    draw_text(str(user1.get_username()), big_text_font, black, screen_width // 2 + 450, 450)
+
+    draw_text("Hand value: ", text_font, black, screen_width // 2 + 450, 510)
+    draw_text(str(user1.get_hand_value()), text_font, black, screen_width // 2 + 535, 510)
 
     draw_text("Chips: ", text_font, black, screen_width // 2 + 450, 550)
     draw_text(str(user1.get_bankroll()), text_font, black, screen_width // 2 + 500, 550)
@@ -1538,8 +1537,8 @@ while running:
         draw_text("Dealer's cards are: ", text_font, black, screen_width // 2 - 80, 70)
     # draw_text(str(dealer.show_hand()), text_font, black, screen_width // 2 - 25, 150)
 
-    draw_text("Pot: ", text_font, black, screen_width // 2 - 25, 300)
-    draw_text(str(pot.get_bankroll()), text_font, black, screen_width // 2 + 25, 300)
+    draw_text("Pot: ", text_font, black, screen_width // 2 - 65, 300)
+    draw_text(str(pot.get_bankroll()), text_font, black, screen_width // 2 - 15, 300)
 
     # draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
     # draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
@@ -1608,12 +1607,12 @@ while running:
         draw_text(str(user1.get_split_hand_3_result()), text_font, black, screen_width // 2 + 400, 150)
 
     if user1.get_can_user_bet() is True:
-        draw_text("Place your bets!", big_text_font, black, screen_width // 2 - 100, 350)
+        draw_text("Place your bets!", big_text_font, black, screen_width // 2 - 125, 350)
         if pot.get_bankroll() != 0:
             clear_bet_button = Button(
                 screen,
-                screen_width // 2 + 250,  # X coordinate of the top-left corner
-                575,  # Y coordinate of the top-left corner
+                screen_width // 2 + 345,  # X coordinate of the top-left corner
+                600,  # Y coordinate of the top-left corner
                 125,
                 25,
                 text='Clear Bets',
@@ -1644,9 +1643,9 @@ while running:
     if user1.get_are_cards_ready_to_be_drawn() is True:
         deal_cards_button = Button(
             screen,
-            screen_width // 2 - 50,  # X coordinate of the top-left corner
+            screen_width // 2 - 87,  # X coordinate of the top-left corner
             400,  # Y coordinate of the top-left corner
-            125,
+            124,
             25,
             text='Draw cards',
             fontSize=20, margin=20,
@@ -1724,9 +1723,9 @@ while running:
     if is_turn_over() is True and game_over_check() is not True:
         new_turn_button = Button(
             screen,
-            screen_width // 2 + 350,  # X coordinate of the top-left corner
-            450,  # Y coordinate of the top-left corner
-            125,
+            screen_width // 2 - 87,  # X coordinate of the top-left corner
+            400,  # Y coordinate of the top-left corner
+            124,
             25,
             text='New Turn',
             fontSize=20, margin=20,
