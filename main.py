@@ -1526,10 +1526,10 @@ async def main():
         draw_text(str(user1.get_username()), big_text_font, black, screen_width // 2 + 450, 450)
 
         draw_text("Hand value: ", text_font, black, screen_width // 2 + 450, 510)
-        draw_text(str(user1.get_hand_value()), text_font, black, screen_width // 2 + 535, 510)
+        draw_text(str(user1.get_hand_value()), text_font, black, screen_width // 2 + 600, 510)
 
         draw_text("Chips: ", text_font, black, screen_width // 2 + 450, 550)
-        draw_text(str(user1.get_bankroll()), text_font, black, screen_width // 2 + 500, 550)
+        draw_text(str(user1.get_bankroll()), text_font, black, screen_width // 2 + 525, 550)
 
         if dealer.get_hand():
             draw_text("Dealer's cards are: ", text_font, black, screen_width // 2 - 80, 70)
@@ -1637,6 +1637,8 @@ async def main():
         ready_to_draw_cards_check()
         show_user_card_image()
         show_dealer_card_image()
+        deck.shuffle_deck()
+
 
         if user1.get_are_cards_ready_to_be_drawn() is True:
             deal_cards_button = Button(
@@ -1733,7 +1735,7 @@ async def main():
             )
             new_turn_button.draw()
             draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
-            draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
+            draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 450, 100)
         else:
             new_turn_button = Button(
                 screen,
