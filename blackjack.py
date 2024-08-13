@@ -1609,19 +1609,20 @@ while running:
 
     if user1.get_can_user_bet() is True:
         draw_text("Place your bets!", big_text_font, black, screen_width // 2 - 100, 350)
-        clear_bet_button = Button(
-            screen,
-            screen_width // 2 + 250,  # X coordinate of the top-left corner
-            575,  # Y coordinate of the top-left corner
-            125,
-            25,
-            text='Clear Bets',
-            fontSize=20, margin=20,
-            inactiveColour=(255, 0, 0),
-            pressedColour=(0, 255, 0), radius=20,
-            onClick=clear_bets
-        )
-        clear_bet_button.draw()
+        if pot.get_bankroll() != 0:
+            clear_bet_button = Button(
+                screen,
+                screen_width // 2 + 250,  # X coordinate of the top-left corner
+                575,  # Y coordinate of the top-left corner
+                125,
+                25,
+                text='Clear Bets',
+                fontSize=20, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+                onClick=clear_bets
+            )
+            clear_bet_button.draw()
     else:
         clear_bet_button = Button(
             screen,
