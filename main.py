@@ -574,7 +574,7 @@ def show_user_card_image():
     for card in user_hand:
         image_file_name = card.get_image()
         img_size = (120, 168)  # Original size: 60x84
-        load_string = "images/cards/all_cards/"
+        load_string = "img/"
         final_image = load_string + image_file_name
         img = pygame.image.load(final_image)
         img = pygame.transform.scale(img, img_size)
@@ -589,14 +589,14 @@ def show_dealer_card_image():
         img_size = (120, 168)  # Original size: 60x84
         if card.get_face_up() is True:
             image_file_name = card.get_image()
-            load_string = "images/cards/all_cards/"
+            load_string = "img/"
             final_image = load_string + image_file_name
             img = pygame.image.load(final_image)
             img = pygame.transform.scale(img, img_size)
             screen.blit(img, (screen_width // 2 - 100 + (40 * i), 100 + (3 * i)))
             i += 1
         if card.get_face_up() is False:
-            img = pygame.image.load('images/cards/all_cards/back_blue_basic_white.png')
+            img = pygame.image.load('img/back_blue_basic_white.png')
             img = pygame.transform.scale(img, img_size)
             screen.blit(img, (screen_width // 2 - 100 + (40 * i), 100 + (3 * i)))
             i += 1
@@ -735,7 +735,7 @@ def split_cards():
         for card in user1.get_split_hand_3():
             image_file_name = card.get_image()
             img_size = (120, 168)  # Original size: 60x84
-            load_string = "images/cards/all_cards/"
+            load_string = "img/"
             final_image = load_string + image_file_name
             img = pygame.image.load(final_image)
             img = pygame.transform.scale(img, img_size)
@@ -763,7 +763,7 @@ def split_cards():
         for card in user1.get_split_hand_2():
             image_file_name = card.get_image()
             img_size = (120, 168)  # Original size: 60x84
-            load_string = "images/cards/all_cards/"
+            load_string = "img/"
             final_image = load_string + image_file_name
             img = pygame.image.load(final_image)
             img = pygame.transform.scale(img, img_size)
@@ -1553,7 +1553,7 @@ async def main():
             for card in user1.get_split_hand():
                 image_file_name = card.get_image()
                 img_size = (120, 168)  # Original size: 60x84
-                load_string = "images/cards/all_cards/"
+                load_string = "img/"
                 final_image = load_string + image_file_name
                 img = pygame.image.load(final_image)
                 img = pygame.transform.scale(img, img_size)
@@ -1572,7 +1572,7 @@ async def main():
             for card in user1.get_split_hand_2():
                 image_file_name = card.get_image()
                 img_size = (120, 168)  # Original size: 60x84
-                load_string = "images/cards/all_cards/"
+                load_string = "img/"
                 final_image = load_string + image_file_name
                 img = pygame.image.load(final_image)
                 img = pygame.transform.scale(img, img_size)
@@ -1591,7 +1591,7 @@ async def main():
             for card in user1.get_split_hand_3():
                 image_file_name = card.get_image()
                 img_size = (120, 168)  # Original size: 60x84
-                load_string = "images/cards/all_cards/"
+                load_string = "img/"
                 final_image = load_string + image_file_name
                 img = pygame.image.load(final_image)
                 img = pygame.transform.scale(img, img_size)
