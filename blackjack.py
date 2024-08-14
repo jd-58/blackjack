@@ -2341,6 +2341,7 @@ while running:
     elif game_over_check() is True and is_turn_over() is True:
         draw_text("Dealer's hand value: ", text_font, black, screen_width // 2 - 80, 35)
         draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 80, 35)
+
     else:
         new_turn_button = Button(
             screen,
