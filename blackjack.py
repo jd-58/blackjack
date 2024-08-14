@@ -1032,6 +1032,12 @@ def hit():
 
 
 def stand():
+    if len(user1.get_hand()) == 2 and user1.get_hand_value() == 21:
+        dealer_hand = dealer.get_hand()
+        dealer_hand[1].set_face_up(True)
+        check_to_change_ace(dealer)
+        final_score_check()
+        return
     if user1.get_is_split_hand_3_active() is True:
         user1.set_is_split_hand_3_active(False)
         return
@@ -1663,7 +1669,7 @@ all_in_button_no_func = Button(
 split_button = Button(
     screen,
     screen_width // 2 - 50,  # X coordinate of the top-left corner
-    450,  # Y coordinate of the top-left corner
+    400,  # Y coordinate of the top-left corner
     75,
     25,
     text='Split',
@@ -1748,7 +1754,7 @@ while running:
     screen.fill("green")
 
     if user1.get_hand():
-        draw_text("Your cards are: ", text_font, black, screen_width // 2 - 80, 470)
+        draw_text("Your cards", text_font, black, screen_width // 2 - 80, 470)
     # draw_text(str(user1.show_hand()), text_font, black, screen_width // 2 - 25, 600)
 
     if user1.get_username() is not None:
@@ -1777,7 +1783,7 @@ while running:
     all_in_button_no_func.draw()
 
     if dealer.get_hand():
-        draw_text("Dealer's cards are: ", text_font, black, screen_width // 2 - 80, 70)
+        draw_text("Dealer's cards", text_font, black, screen_width // 2 - 80, 70)
     # draw_text(str(dealer.show_hand()), text_font, black, screen_width // 2 - 25, 150)
 
     draw_text("Pot: ", text_font, black, screen_width // 2 - 50, 300)
