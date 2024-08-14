@@ -73,12 +73,20 @@ class Card:
         """Returns the value of the selected card"""
         return self._value
 
+    def add_to_name(self, addition):
+        """Adds something to the end of a card's name"""
+        self._name_and_suit += "_" + str(addition)
+
     def get_name_and_suit(self):
         """Returns the card's name with the suit attached"""
         if self._face_up is True:
             return str(self._name_and_suit)
         else:
             return "Face down"
+
+    def get_name_and_suit_always(self):
+        """Returns the card's name with the suit attached, even if card is face down"""
+        return str(self._name_and_suit)
 
     def set_face_up(self, face_up_value):
         """Sets a card's face up value. True if face up, False if face down."""
@@ -133,6 +141,11 @@ class Deck:
         drawn_card.set_face_up(is_face_up)
         return drawn_card
 
+    def add_number_to_card_name(self, number):
+        """Adds a number to the end of each card name, to keep track of duplicate cards from multiple decks"""
+        for card in self._cards:
+            card.add_to_name(str(number))
+
     def add_card_to_deck(self, card_to_add):
         """Adds cards to the deck"""
         self._cards.append(card_to_add)
@@ -148,6 +161,11 @@ class Deck:
     def duplicate_deck(self, times_to_duplicate):
         """Duplicates the current deck a set number of times"""
         self._cards = self._cards * times_to_duplicate
+
+    def merge_decks(self, deck_to_merge):
+        """Merges decks together"""
+        for card in deck_to_merge:
+            self._cards.append(card)
 
 
 class User:
@@ -177,6 +195,7 @@ class User:
         self._split_hand_3_result = None
         self._cards_ready_to_be_drawn = False
         self._split_count_during_turn = 0
+        self._chips_gained_on_turn = 0
 
     def draw_user_card(self, game_deck, number_of_cards, is_face_up=True):
         """Adds a specified number of cards to the user's hand from the deck."""
@@ -213,6 +232,10 @@ class User:
     def get_hand(self):
         """Returns the user's hand"""
         return self._hand
+
+    def get_chips_gained_on_turn(self):
+        """Returns the amount of chips gained or lost on a turn"""
+        return self._chips_gained_on_turn
 
     def get_can_user_bet(self):
         """Returns True if the user is able to bet, False if not"""
@@ -315,6 +338,7 @@ class User:
             current_value += card.get_value()
         return current_value
 
+
     def get_split_hand_3_value(self):
         """Returns the value of the user's current 3rd split hand"""
         current_value = 0
@@ -325,6 +349,10 @@ class User:
     def set_username(self, new_username):
         """Changes the user's username"""
         self._username = new_username
+
+    def set_chips_gained_on_turn(self, new_amount):
+        """Sets the amount of chips gained on the current turn to a specific amount"""
+        user1._chips_gained_on_turn = new_amount
 
     def set_are_cards_ready_to_be_drawn(self, new_condition):
         """True if cards are ready to be drawn, False if not. Changes this value."""
@@ -345,6 +373,10 @@ class User:
     def set_is_split_hand_3_active(self, new_condition):
         """Changes whether split hand 3 is active"""
         self._is_split_hand_3_active = new_condition
+
+    def update_amount_of_chips_gained_on_turn(self, new_amount):
+        """Updates the amount of chips gained or lost by the specified amount"""
+        self._chips_gained_on_turn += new_amount
 
     def set_hand(self, specified_hand):
         """Changes the user's hand. For testing purposes"""
@@ -440,8 +472,9 @@ class User:
         self._score = new_score
 
     def set_amount_bet(self, new_amount):
-        """Changes the amount a user has bet during the current hand to a specified amount."""
+        """Changes the amount a user has bet during the current hand (not including splits) to a specified amount."""
         self._amount_bet = new_amount
+
 
     def update_score(self):
         """Updates the user's score to reflect their current hand"""
@@ -496,8 +529,22 @@ class User:
         return self._amount_bet
 
 
-deck = Deck()  # The deck we will use for the game. This deck contains 6 decks.
-deck.duplicate_deck(6)  # 6 decks of cards are being used.
+deck = Deck()  # The deck we will use for the game.
+deck2 = Deck()
+deck2.add_number_to_card_name(2)
+deck3 = Deck()
+deck3.add_number_to_card_name(3)
+deck4 = Deck()
+deck4.add_number_to_card_name(4)
+deck5 = Deck()
+deck5.add_number_to_card_name(5)
+deck6 = Deck()
+deck6.add_number_to_card_name(6)
+deck.merge_decks(deck2.get_deck())
+deck.merge_decks(deck3.get_deck())
+deck.merge_decks(deck4.get_deck())
+deck.merge_decks(deck5.get_deck())
+deck.merge_decks(deck6.get_deck())
 
 
 user1 = User(bankroll=1000)
@@ -798,6 +845,34 @@ def split_cards():
                 stand()
         return
     if split_check() is True:
+        if user1.get_split_hand():
+            user1.set_split_hand_2_result('in-progress')
+            user_hand_to_split = user1.get_split_hand()
+            for card in user_hand_to_split:
+                if card.get_name() == 'ace':
+                    card.set_value(11)
+                    card.set_has_value_changed(False)
+            user1.update_split_hand_2(user_hand_to_split[0])
+            user1.update_amount_bet_on_split_2(user1.get_amount_bet_on_split())
+            user1.update_bankroll(-user1.get_amount_bet_on_split())
+            pot.update_bankroll(user1.get_amount_bet_on_split_2())
+            i = 0
+            for card in user1.get_split_hand_2():
+                image_file_name = card.get_image()
+                img_size = (120, 168)  # Original size: 60x84
+                load_string = "img/cards/all_cards/"
+                final_image = load_string + image_file_name
+                img = pygame.image.load(final_image)
+                img = pygame.transform.scale(img, img_size)
+                screen.blit(img, (screen_width // 2 - 400 + (40 * i), 500 + (3 * i)))
+            user1.set_is_split_hand_2_active(True)
+            del user_hand_to_split[0]
+            user1.update_split_count_during_turn(1)
+            for card in user1.get_split_hand_2():
+                if card.get_name() == 'ace':
+                    hit()
+                    stand()
+            return
         user1.set_split_hand_result('in-progress')
         user_hand = user1.get_hand()
         for card in user_hand:
@@ -842,11 +917,6 @@ def draw_specific_cards_button_func():  # This is for testing certain hand combi
     is_double_down_possible()
     split_check()
 
-
-def check_dealer_score():
-    if dealer.get_hand_value() > 17:
-        for card in dealer.get_hand():
-            card.set_face_up(True)
 
 
 def hit():
@@ -989,6 +1059,7 @@ def game_over_check():
 
 
 def clear_table():
+    user1.set_chips_gained_on_turn(0)
     change_ace_value_to_11_for_all_user_hands(user1.get_hand())
     change_ace_value_to_11_for_all_user_hands(user1.get_split_hand())
     change_ace_value_to_11_for_all_user_hands(user1.get_split_hand_2())
@@ -1211,6 +1282,19 @@ def final_score_check():
     return
 
 
+def blackjack_check():
+    if user1.get_split_hand_3():
+        if user1.get_split_hand_3_value() == 21:
+            stand()
+    if user1.get_split_hand_2():
+        if user1.get_split_hand_2_value() == 21:
+            stand()
+    if user1.get_split_hand():
+        if user1.get_split_hand_value() == 21:
+            stand()
+    if user1.get_hand_value() == 21:
+        stand()
+
 def is_turn_over():
     if user1.get_turn_result() != 'in-progress' and dealer.get_turn_result() != 'in-progress':
         return True
@@ -1229,45 +1313,56 @@ def distribute_chips_from_pot():
     if user1.get_split_hand_result() is not None:
         if user1.get_split_hand_result() == 'win' or user1.get_split_hand_result() == 'blackjack':
             user1.update_bankroll(2 * user1.get_amount_bet_on_split())
-            pot.set_bankroll(0)
+            user1.update_amount_of_chips_gained_on_turn(2 * user1.get_amount_bet_on_split())
+            pot.update_bankroll(user1.get_amount_bet_on_split())
             user1.set_amount_bet_on_split(0)
         elif user1.get_split_hand_result() == 'push':
             user1.update_bankroll(user1.get_amount_bet_on_split())
+            user1.update_amount_of_chips_gained_on_turn(user1.get_amount_bet_on_split())
             pot.update_bankroll(-user1.get_amount_bet_on_split())
             user1.set_amount_bet_on_split(0)
         elif user1.get_split_hand_result() == 'loss':
-            pot.update_bankroll(-user1.get_amount_bet_on_split())
+            user1.update_amount_of_chips_gained_on_turn(-user1.get_amount_bet_on_split())
+            pot.update_bankroll(user1.get_amount_bet_on_split())
             user1.set_amount_bet_on_split(0)
     if user1.get_split_hand_2_result() is not None:
         if user1.get_split_hand_2_result() == 'win' or user1.get_split_hand_2_result() == 'blackjack':
             user1.update_bankroll(2 * user1.get_amount_bet_on_split_2())
+            user1.update_amount_of_chips_gained_on_turn(2 * user1.get_amount_bet_on_split_2())
             pot.set_bankroll(0)
             user1.set_amount_bet_on_split_2(0)
         elif user1.get_split_hand_2_result() == 'push':
             user1.update_bankroll(user1.get_amount_bet_on_split_2())
+            user1.update_amount_of_chips_gained_on_turn(user1.get_amount_bet_on_split_2())
             pot.set_bankroll(0)
             user1.set_amount_bet_on_split_2(0)
         elif user1.get_split_hand_2_result() == 'loss':
+            user1.update_amount_of_chips_gained_on_turn(-user1.get_amount_bet_on_split_2())
             user1.set_amount_bet_on_split_2(0)
             pot.set_bankroll(0)
     if user1.get_split_hand_3_result() is not None:
         if user1.get_split_hand_3_result() == 'win' or user1.get_split_hand_3_result() == 'blackjack':
-            user1.update_bankroll(2 * user1.get_amount_bet_on_split_2())
+            user1.update_bankroll(2 * user1.get_amount_bet_on_split_3())
+            user1.update_amount_of_chips_gained_on_turn(2 * user1.get_amount_bet_on_split_3())
             pot.set_bankroll(0)
-            user1.set_amount_bet_on_split_2(0)
+            user1.set_amount_bet_on_split_3(0)
         elif user1.get_split_hand_3_result() == 'push':
-            user1.update_bankroll(user1.get_amount_bet_on_split_2())
+            user1.update_bankroll(user1.get_amount_bet_on_split_3())
+            user1.update_amount_of_chips_gained_on_turn(user1.get_amount_bet_on_split_3())
             pot.set_bankroll(0)
-            user1.set_amount_bet_on_split_2(0)
+            user1.set_amount_bet_on_split_3(0)
         elif user1.get_split_hand_3_result() == 'loss':
-            user1.set_amount_bet_on_split_2(0)
+            user1.update_amount_of_chips_gained_on_turn(-user1.get_amount_bet_on_split_3())
+            user1.set_amount_bet_on_split_3(0)
             pot.set_bankroll(0)
     if user1.get_turn_result() == 'win':
         user1.update_bankroll(2 * user1.get_amount_bet())
+        user1.update_amount_of_chips_gained_on_turn(2 * user1.get_amount_bet())
         pot.set_bankroll(0)
         user1.set_amount_bet(0)
     elif user1.get_turn_result() == 'blackjack':
         user1.update_bankroll(math.floor(2.5 * user1.get_amount_bet()))
+        user1.update_amount_of_chips_gained_on_turn(math.floor(2.5 * user1.get_amount_bet()))
         pot.set_bankroll(0)
         user1.set_amount_bet(0)
     elif user1.get_turn_result() == 'push':
@@ -1275,6 +1370,7 @@ def distribute_chips_from_pot():
         pot.set_bankroll(0)
         user1.set_amount_bet(0)
     elif user1.get_turn_result() == 'loss':
+        user1.update_amount_of_chips_gained_on_turn(-user1.get_amount_bet())
         pot.set_bankroll(0)
         user1.set_amount_bet(0)
 
@@ -1660,8 +1756,6 @@ while running:
     # draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
     # draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
 
-    draw_text("Turn result: ", text_font, black, screen_width // 2 + 250, 150)
-    draw_text(str(user1.get_turn_result()), text_font, black, screen_width // 2 + 350, 150)
 
     # draw_text("Cards in deck: ", text_font, black, screen_width // 2 - 350, 300)
     # draw_text(str(deck.get_deck_size()), text_font, black, screen_width // 2 - 250, 300)
@@ -2205,8 +2299,18 @@ while running:
             onClick=clear_table
         )
         new_turn_button.draw()
-        draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
-        draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 350, 100)
+        draw_text("Dealer's hand value: ", text_font, black, screen_width // 2 + 250, 100)
+        draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 400, 100)
+
+        draw_text("Turn result: ", text_font, black, screen_width // 2 + 250, 150)
+        draw_text(str(user1.get_turn_result()), text_font, black, screen_width // 2 + 325, 150)
+
+        # Telling the user how many chips they gained or lost
+        if user1.get_chips_gained_on_turn() > 0:
+            chips_gained_text = "+" + str(user1.get_chips_gained_on_turn()) + " chips"
+        else:
+            chips_gained_text = str(user1.get_chips_gained_on_turn()) + " chips"
+        draw_text(chips_gained_text, text_font, black, screen_width // 2 + 325, 170)
     else:
         new_turn_button = Button(
             screen,
@@ -2237,13 +2341,11 @@ while running:
         new_game_button.draw()
         draw_text("Game Over", big_text_font, black, screen_width // 2 - 75, 350)
 
-
+    blackjack_check()
     pygame.display.flip()
     pygame.display.update()
 
-    # check_dealer_score()
     turn_over_check()
-
 
 
     pw.update(events)
