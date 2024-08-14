@@ -739,12 +739,29 @@ def split_check_4():
 def is_double_down_possible():
     if user1.get_is_split_hand_active() is True:
         user_split_hand = user1.get_split_hand()
-        if len(user_split_hand) == 2 and 8 < user1.get_split_hand_value() < 12:
+        if (len(user_split_hand) == 2 and 8 < user1.get_split_hand_value() < 12
+                and user1.get_bankroll() >= user1.get_amount_bet_on_split()):
+            return True
+        else:
+            return False
+
+    if user1.get_is_split_hand_2_active() is True:
+        user_split_hand = user1.get_split_hand_2()
+        if (len(user_split_hand) == 2 and 8 < user1.get_split_hand_2_value() < 12
+                and user1.get_bankroll() >= user1.get_amount_bet_on_split_2()):
+            return True
+        else:
+            return False
+
+    if user1.get_is_split_hand_3_active() is True:
+        user_split_hand = user1.get_split_hand_3()
+        if (len(user_split_hand) == 2 and 8 < user1.get_split_hand_3_value() < 12
+                and user1.get_bankroll() >= user1.get_amount_bet_on_split_3()):
             return True
         else:
             return False
     user_hand = user1.get_hand()
-    if len(user_hand) == 2 and 8 < user1.get_hand_value() < 12:
+    if len(user_hand) == 2 and 8 < user1.get_hand_value() < 12 and user1.get_bankroll() >= user1.get_amount_bet():
         if user1.get_turn_result() == 'in-progress':
             return True
     else:
@@ -781,6 +798,7 @@ def double_down():
         user1.update_bankroll(-user1.get_amount_bet())
         user1.update_amount_bet(user1.get_amount_bet())
         user1.draw_user_card(deck, 1, True)
+        print("Amount bet is now: ", user1.get_amount_bet())
         stand()
         return
     return
@@ -1619,7 +1637,7 @@ all_in_button = Button(
     fontSize=16, margin=20,
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
-    onClick=user_bet_one_thousand
+    onClick=user_bet_all_in
 )
 
 all_in_button_no_func = Button(
@@ -1986,7 +2004,7 @@ while running:
             fontSize=16, margin=20,
             inactiveColour=(255, 0, 0),
             pressedColour=(0, 255, 0), radius=20,
-            onClick=user_bet_one_thousand
+            onClick=user_bet_all_in
         )
 
         all_in_button_no_func = Button(
@@ -2189,7 +2207,7 @@ while running:
             fontSize=16, margin=20,
             inactiveColour=(255, 0, 0),
             pressedColour=(0, 255, 0), radius=20,
-            onClick=user_bet_one_thousand
+            onClick=user_bet_all_in
         )
 
         all_in_button_no_func = Button(
