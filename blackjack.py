@@ -1023,7 +1023,12 @@ def hit():
                     return
     if user1.get_hand_value() > 21:
         if user1.get_split_hand():
+            while dealer.get_hand_value() <= 16:
+                dealer.draw_user_card(deck, 1, True)
+                check_to_change_ace(dealer)
+                check_to_change_ace(dealer)
             split_hand_score_check()
+            stand()
         user1.set_turn_result('Loss')
         dealer.set_turn_result('Win')
 
@@ -1052,7 +1057,7 @@ def stand():
 def initial_score_check():
     check_to_change_ace(user1)
     check_to_change_ace(dealer)
-    if (user1.get_hand_value() > 21  # User busts
+    if (user1.get_hand_value() > 21 and user1.get_split_hand == []  # User busts
             or dealer.get_hand_value() == 21 and user1.get_hand_value != 21):  # Dealer gets natural blackjack
         dealer.set_turn_result('Win')
         user1.set_turn_result('Loss')
@@ -2333,6 +2338,9 @@ while running:
         else:
             chips_gained_text = str(user1.get_chips_gained_on_turn()) + " chips"
         draw_text(chips_gained_text, text_font, black, screen_width // 2 + 250, 110)
+    elif game_over_check() is True and is_turn_over() is True:
+        draw_text("Dealer's hand value: ", text_font, black, screen_width // 2 - 80, 35)
+        draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 80, 35)
     else:
         new_turn_button = Button(
             screen,
@@ -2346,6 +2354,17 @@ while running:
             pressedColour=(0, 255, 0), radius=20,
             onClick=clear_table
         )
+        new_turn_button.draw()
+
+        draw_text("Hand result: ", text_font, black, screen_width // 2 + 250, 150)
+        draw_text(str(user1.get_turn_result()), text_font, black, screen_width // 2 + 350, 150)
+
+        # Telling the user how many chips they gained or lost
+        if user1.get_chips_gained_on_turn() > 0:
+            chips_gained_text = "+" + str(user1.get_chips_gained_on_turn()) + " chips"
+        else:
+            chips_gained_text = str(user1.get_chips_gained_on_turn()) + " chips"
+        draw_text(chips_gained_text, text_font, black, screen_width // 2 + 250, 110)
 
     if game_over_check() is not True:
         if user1.get_username() is None:
