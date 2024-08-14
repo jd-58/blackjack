@@ -628,8 +628,18 @@ def draw_cards_button_func():
     deck.shuffle_deck()
     user1.set_can_user_bet(False)
     user1.draw_user_card(deck, 2, True)
+    # card1 = Card(11, 'ace', 'hearts')
+    # card2 = Card(10, '10', 'spades')
+    # hand2 = [card1, card2]
+    # user1.set_hand(hand2)
     dealer.draw_user_card(deck, 1, True)
     dealer.draw_user_card(deck, 1, False)
+    if user1.get_hand_value() == 21 and dealer.get_hand_value() != 21:
+        dealer.set_turn_result('Loss')
+        user1.set_turn_result('Blackjack')
+        distribute_chips_from_pot()
+        turn_over_check()
+        is_turn_over()
     initial_score_check()
     is_double_down_possible()
     split_check()
@@ -787,7 +797,6 @@ def double_down():
         user1.update_bankroll(-user1.get_amount_bet())
         user1.update_amount_bet(user1.get_amount_bet())
         user1.draw_user_card(deck, 1, True)
-        print("Amount bet is now: ", user1.get_amount_bet())
         stand()
         return
     return
@@ -1046,16 +1055,24 @@ def stand():
 def initial_score_check():
     check_to_change_ace(user1)
     check_to_change_ace(dealer)
-    if (user1.get_hand_value() > 21 and user1.get_split_hand == []  # User busts
+    if user1.get_hand_value() == 21 and dealer.get_hand_value() != 21:  # Player gets natural 21 and dealer does not
+        dealer.set_turn_result('Loss')
+        user1.set_turn_result('Blackjack')
+        print("User turn result: ", user1.get_turn_result())
+        print("Dealer turn result: ", dealer.get_turn_result())
+        is_turn_over()
+        print(is_turn_over())
+        return
+    elif (user1.get_hand_value() > 21 and user1.get_split_hand == []  # User busts
             or dealer.get_hand_value() == 21 and user1.get_hand_value != 21):  # Dealer gets natural blackjack
         dealer.set_turn_result('Win')
         user1.set_turn_result('Loss')
-    elif user1.get_hand_value() == 21 and dealer.get_hand_value() != 21:  # Player gets natural 21 and dealer does not
-        dealer.set_turn_result('Loss')
-        user1.set_turn_result('Blackjack')
+        return
     elif user1.get_hand_value() == 21 and dealer.get_hand_value() == 21:  # Both player and dealer get natural 21
         dealer.set_turn_result('Push')
         user1.set_turn_result('Push')
+        turn_over_check()
+        return
 
 
 def refill_bankroll():
@@ -1296,15 +1313,15 @@ def final_score_check():
 
 def blackjack_check():
     if user1.get_split_hand_3():
-        if user1.get_split_hand_3_value() == 21:
+        if user1.get_split_hand_3_value() == 21 and user1.get_split_hand_3_result() == 'in-progress':
             stand()
     if user1.get_split_hand_2():
-        if user1.get_split_hand_2_value() == 21:
+        if user1.get_split_hand_2_value() == 21 and user1.get_split_hand_2_result() == 'in-progress':
             stand()
     if user1.get_split_hand():
-        if user1.get_split_hand_value() == 21:
+        if user1.get_split_hand_value() == 21 and user1.get_split_hand_result == 'in-progress':
             stand()
-    if user1.get_hand_value() == 21:
+    if user1.get_hand_value() == 21 and user1.get_turn_result() == 'in-progress':
         stand()
 
 def is_turn_over():
