@@ -697,7 +697,7 @@ def split_check():
     if len(user_hand) == 2:
         card1 = user_hand[0].get_name()
         card2 = user_hand[1].get_name()
-        if card1 == card2:
+        if card1 == card2 and user1.get_bankroll() >= user1.get_amount_bet():
             return True
         else:
             return False
@@ -709,7 +709,7 @@ def split_check_2():
         if len(user_split_hand) == 2:
             card1_split = user_split_hand[0].get_name()
             card2_split = user_split_hand[1].get_name()
-            if card1_split == card2_split:
+            if card1_split == card2_split and user1.get_bankroll() >= user1.get_amount_bet_on_split():
                 return True
         return False
 
@@ -720,18 +720,7 @@ def split_check_3():
         if len(user_split_hand2) == 2:
             card1_split = user_split_hand2[0].get_name()
             card2_split = user_split_hand2[1].get_name()
-            if card1_split == card2_split:
-                return True
-        return False
-
-
-def split_check_4():
-    if user1.get_is_split_hand_2_active() is True:
-        user_split_hand3 = user1.get_split_hand_3()
-        if len(user_split_hand3) == 2:
-            card1_split = user_split_hand3[0].get_name()
-            card2_split = user_split_hand3[1].get_name()
-            if card1_split == card2_split:
+            if card1_split == card2_split and user1.get_bankroll() >= user1.get_amount_bet_on_split_2():
                 return True
         return False
 
@@ -940,7 +929,7 @@ def draw_specific_cards_button_func():  # This is for testing certain hand combi
 def hit():
     if pot.get_bankroll() == 0:
         return "No bets placed"
-    split_check_4()
+
     split_check_3()
     split_check_2()
     split_check()
@@ -2387,7 +2376,7 @@ while running:
     if is_double_down_possible() is True:
         double_down_button.draw()
 
-    if split_check() is True or split_check_2() is True or split_check_3() is True or split_check_4() is True:
+    if split_check() is True or split_check_2() is True or split_check_3() is True:
         if user1.get_split_count_this_turn() < 3 and user1.get_turn_result() == 'in-progress':
             split_button.draw()
 
