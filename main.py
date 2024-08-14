@@ -143,7 +143,7 @@ class User:
         self._split_hand = []
         self._split_hand2 = []
         self._split_hand3 = []
-        self._can_bet = True
+        self._can_bet = False
         self._bankroll = 1000
         self._score = 0
         self._turn_result = 'in-progress'
@@ -1260,6 +1260,7 @@ def distribute_chips_from_pot():
 def update_username():
     text_entered = str(username_textbox.getText())
     user1.set_username(text_entered)
+    user1.set_can_user_bet(True)
 
 pygame.init()
 screen_width = 1280
@@ -1350,6 +1351,17 @@ one_dollar_chip = Button(
     onClick=user_bet_one
 )
 
+one_dollar_chip_no_func = Button(
+    screen,
+    screen_width // 2 + 250,  # X coordinate of the top-left corner
+    650,  # Y coordinate of the top-left corner
+    25,
+    25,
+    text='1',
+    fontSize=10, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+)
 
 
 five_dollar_chip = Button(
@@ -1365,6 +1377,18 @@ five_dollar_chip = Button(
     onClick=user_bet_five
 )
 
+five_dollar_chip_no_func = Button(
+    screen,
+    screen_width // 2 + 300,  # X coordinate of the top-left corner
+    650,  # Y coordinate of the top-left corner
+    25,
+    25,
+    text='5',
+    fontSize=10, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+)
+
 twenty_five_dollar_chip = Button(
     screen,
     screen_width // 2 + 350,  # X coordinate of the top-left corner
@@ -1376,6 +1400,18 @@ twenty_five_dollar_chip = Button(
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
     onClick=user_bet_twenty_five
+)
+
+twenty_five_dollar_chip_no_func = Button(
+    screen,
+    screen_width // 2 + 350,  # X coordinate of the top-left corner
+    650,  # Y coordinate of the top-left corner
+    25,
+    25,
+    text='25',
+    fontSize=10, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
 )
 
 one_hundred_dollar_chip = Button(
@@ -1391,6 +1427,18 @@ one_hundred_dollar_chip = Button(
     onClick=user_bet_one_hundred
 )
 
+one_hundred_dollar_chip_no_func = Button(
+    screen,
+    screen_width // 2 + 400,  # X coordinate of the top-left corner
+    650,  # Y coordinate of the top-left corner
+    25,
+    25,
+    text='100',
+    fontSize=10, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+)
+
 five_hundred_dollar_chip = Button(
     screen,
     screen_width // 2 + 450,  # X coordinate of the top-left corner
@@ -1402,6 +1450,18 @@ five_hundred_dollar_chip = Button(
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
     onClick=user_bet_five_hundred
+)
+
+five_hundred_dollar_chip_no_func = Button(
+    screen,
+    screen_width // 2 + 450,  # X coordinate of the top-left corner
+    650,  # Y coordinate of the top-left corner
+    25,
+    25,
+    text='500',
+    fontSize=10, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
 )
 
 one_thousand_dollar_chip = Button(
@@ -1417,6 +1477,18 @@ one_thousand_dollar_chip = Button(
     onClick=user_bet_one_thousand
 )
 
+one_thousand_dollar_chip_no_func = Button(
+    screen,
+    screen_width // 2 + 500,  # X coordinate of the top-left corner
+    650,  # Y coordinate of the top-left corner
+    25,
+    25,
+    text='1000',
+    fontSize=10, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
+)
+
 all_in_button = Button(
     screen,
     screen_width // 2 + 550,  # X coordinate of the top-left corner
@@ -1428,6 +1500,18 @@ all_in_button = Button(
     inactiveColour=(255, 0, 0),
     pressedColour=(0, 255, 0), radius=20,
     onClick=user_bet_one_thousand
+)
+
+all_in_button_no_func = Button(
+    screen,
+    screen_width // 2 + 550,  # X coordinate of the top-left corner
+    650,  # Y coordinate of the top-left corner
+    75,
+    25,
+    text='All In',
+    fontSize=16, margin=20,
+    inactiveColour=(255, 0, 0),
+    pressedColour=(0, 255, 0), radius=20,
 )
 
 split_button = Button(
@@ -1531,6 +1615,7 @@ async def main():
         draw_text("Chips: ", text_font, black, screen_width // 2 + 450, 550)
         draw_text(str(user1.get_bankroll()), text_font, black, screen_width // 2 + 525, 550)
 
+
         if dealer.get_hand():
             draw_text("Dealer's cards are: ", text_font, black, screen_width // 2 - 80, 70)
         # draw_text(str(dealer.show_hand()), text_font, black, screen_width // 2 - 25, 150)
@@ -1606,6 +1691,182 @@ async def main():
 
         if user1.get_can_user_bet() is True:
             draw_text("Place your bets!", big_text_font, black, screen_width // 2 - 125, 350)
+            # Moving the non-functioning chips off-screen
+            one_dollar_chip = Button(
+                screen,
+                screen_width // 2 + 250,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='1',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+                onClick=user_bet_one
+            )
+
+            one_dollar_chip_no_func = Button(
+                screen,
+                screen_width // 2 + 55250,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='1',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+            )
+
+            five_dollar_chip = Button(
+                screen,
+                screen_width // 2 + 300,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='5',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+                onClick=user_bet_five
+            )
+
+            five_dollar_chip_no_func = Button(
+                screen,
+                screen_width // 2 + 55300,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='5',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+            )
+
+            twenty_five_dollar_chip = Button(
+                screen,
+                screen_width // 2 + 350,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='25',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+                onClick=user_bet_twenty_five
+            )
+
+            twenty_five_dollar_chip_no_func = Button(
+                screen,
+                screen_width // 2 + 55350,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='25',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+            )
+
+            one_hundred_dollar_chip = Button(
+                screen,
+                screen_width // 2 + 400,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='100',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+                onClick=user_bet_one_hundred
+            )
+
+            one_hundred_dollar_chip_no_func = Button(
+                screen,
+                screen_width // 2 + 55400,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='100',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+            )
+
+            five_hundred_dollar_chip = Button(
+                screen,
+                screen_width // 2 + 450,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='500',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+                onClick=user_bet_five_hundred
+            )
+
+            five_hundred_dollar_chip_no_func = Button(
+                screen,
+                screen_width // 2 + 55450,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='500',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+            )
+
+            one_thousand_dollar_chip = Button(
+                screen,
+                screen_width // 2 + 500,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='1000',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+                onClick=user_bet_one_thousand
+            )
+
+            one_thousand_dollar_chip_no_func = Button(
+                screen,
+                screen_width // 2 + 55500,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='1000',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+            )
+
+            all_in_button = Button(
+                screen,
+                screen_width // 2 + 550,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                75,
+                25,
+                text='All In',
+                fontSize=16, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+                onClick=user_bet_one_thousand
+            )
+
+            all_in_button_no_func = Button(
+                screen,
+                screen_width // 2 + 55550,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                75,
+                25,
+                text='All In',
+                fontSize=16, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+            )
+
             if pot.get_bankroll() != 0:
                 clear_bet_button = Button(
                     screen,
@@ -1632,6 +1893,181 @@ async def main():
                 inactiveColour=(255, 0, 0),
                 pressedColour=(0, 255, 0), radius=20,
                 onClick=clear_bets
+            )
+            # Moving functioning chips off-screen
+            one_dollar_chip = Button(
+                screen,
+                screen_width // 2 + 55250,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='1',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+                onClick=user_bet_one
+            )
+
+            one_dollar_chip_no_func = Button(
+                screen,
+                screen_width // 2 + 250,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='1',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+            )
+
+            five_dollar_chip = Button(
+                screen,
+                screen_width // 2 + 55300,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='5',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+                onClick=user_bet_five
+            )
+
+            five_dollar_chip_no_func = Button(
+                screen,
+                screen_width // 2 + 300,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='5',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+            )
+
+            twenty_five_dollar_chip = Button(
+                screen,
+                screen_width // 2 + 55350,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='25',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+                onClick=user_bet_twenty_five
+            )
+
+            twenty_five_dollar_chip_no_func = Button(
+                screen,
+                screen_width // 2 + 350,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='25',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+            )
+
+            one_hundred_dollar_chip = Button(
+                screen,
+                screen_width // 2 + 55400,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='100',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+                onClick=user_bet_one_hundred
+            )
+
+            one_hundred_dollar_chip_no_func = Button(
+                screen,
+                screen_width // 2 + 400,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='100',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+            )
+
+            five_hundred_dollar_chip = Button(
+                screen,
+                screen_width // 2 + 55450,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='500',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+                onClick=user_bet_five_hundred
+            )
+
+            five_hundred_dollar_chip_no_func = Button(
+                screen,
+                screen_width // 2 + 450,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='500',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+            )
+
+            one_thousand_dollar_chip = Button(
+                screen,
+                screen_width // 2 + 55500,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='1000',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+                onClick=user_bet_one_thousand
+            )
+
+            one_thousand_dollar_chip_no_func = Button(
+                screen,
+                screen_width // 2 + 500,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                25,
+                25,
+                text='1000',
+                fontSize=10, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+            )
+
+            all_in_button = Button(
+                screen,
+                screen_width // 2 + 55550,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                75,
+                25,
+                text='All In',
+                fontSize=16, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
+                onClick=user_bet_one_thousand
+            )
+
+            all_in_button_no_func = Button(
+                screen,
+                screen_width // 2 + 550,  # X coordinate of the top-left corner
+                650,  # Y coordinate of the top-left corner
+                75,
+                25,
+                text='All In',
+                fontSize=16, margin=20,
+                inactiveColour=(255, 0, 0),
+                pressedColour=(0, 255, 0), radius=20,
             )
 
         ready_to_draw_cards_check()
@@ -1751,15 +2187,6 @@ async def main():
             )
 
         if game_over_check() is not True:
-            # deal_specific_cards_button.draw()
-            one_dollar_chip.draw()
-            five_dollar_chip.draw()
-            twenty_five_dollar_chip.draw()
-            one_hundred_dollar_chip.draw()
-            five_hundred_dollar_chip.draw()
-            one_thousand_dollar_chip.draw()
-            # refill_bankroll_button.draw()
-            all_in_button.draw()
             if user1.get_username() is None:
                 draw_text("Enter username", big_text_font, black, screen_width // 2 - 120, 450)
                 username_textbox.draw()
@@ -1775,6 +2202,21 @@ async def main():
             new_game_button.draw()
             draw_text("Game Over", big_text_font, black, screen_width // 2 - 75, 350)
 
+        one_dollar_chip.draw()
+        five_dollar_chip.draw()
+        twenty_five_dollar_chip.draw()
+        one_hundred_dollar_chip.draw()
+        five_hundred_dollar_chip.draw()
+        one_thousand_dollar_chip.draw()
+        all_in_button.draw()
+
+        one_dollar_chip_no_func.draw()
+        five_dollar_chip_no_func.draw()
+        twenty_five_dollar_chip_no_func.draw()
+        one_hundred_dollar_chip_no_func.draw()
+        five_hundred_dollar_chip_no_func.draw()
+        one_thousand_dollar_chip_no_func.draw()
+        all_in_button_no_func.draw()
 
         pygame.display.flip()
         pygame.display.update()
