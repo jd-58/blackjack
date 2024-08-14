@@ -1723,7 +1723,8 @@ while running:
         draw_text("Your cards are: ", text_font, black, screen_width // 2 - 80, 475)
     # draw_text(str(user1.show_hand()), text_font, black, screen_width // 2 - 25, 600)
 
-    draw_text(str(user1.get_username()), big_text_font, black, screen_width // 2 + 450, 450)
+    if user1.get_username() is not None:
+        draw_text(str(user1.get_username()), big_text_font, black, screen_width // 2 + 450, 450)
 
     draw_text("Hand value: ", text_font, black, screen_width // 2 + 450, 510)
     draw_text(str(user1.get_hand_value()), text_font, black, screen_width // 2 + 535, 510)
@@ -1751,7 +1752,7 @@ while running:
         draw_text("Dealer's cards are: ", text_font, black, screen_width // 2 - 80, 70)
     # draw_text(str(dealer.show_hand()), text_font, black, screen_width // 2 - 25, 150)
 
-    draw_text("Pot: ", text_font, black, screen_width // 2 - 65, 300)
+    draw_text("Pot: ", text_font, black, screen_width // 2 - 50, 300)
     draw_text(str(pot.get_bankroll()), text_font, black, screen_width // 2 - 15, 300)
 
     # draw_text("Dealer's score: ", text_font, black, screen_width // 2 + 250, 100)
@@ -1774,11 +1775,11 @@ while running:
             screen.blit(img, (25 + (40 * i), 525 + (3 * i)))
             i += 1
 
-        draw_text("Your split score: ", text_font, black, screen_width // 2 + 250, 525)
-        draw_text(str(user1.get_split_hand_value()), text_font, black, screen_width // 2 + 350, 525)
+        draw_text("Split hand value: ", text_font, black, screen_width // 2 + 250, 510)
+        draw_text(str(user1.get_split_hand_value()), text_font, black, screen_width // 2 + 350, 510)
 
-        draw_text("Split hand result: ", text_font, black, screen_width // 2 + 250, 300)
-        draw_text(str(user1.get_split_hand_result()), text_font, black, screen_width // 2 + 400, 300)
+        draw_text("Split hand result: ", text_font, black, screen_width // 2 + 250, 190)
+        draw_text(str(user1.get_split_hand_result()), text_font, black, screen_width // 2 + 400, 190)
 
     if user1.get_split_hand_2_result() is not None:
         draw_text("Your 2nd split cards are: ", text_font, black, 30, 250)
@@ -1793,11 +1794,11 @@ while running:
             screen.blit(img, (25 + (40 * i), 275 + (3 * i)))
             i += 1
 
-        draw_text("Your 2nd split score: ", text_font, black, screen_width // 2 + 250, 500)
-        draw_text(str(user1.get_split_hand_2_value()), text_font, black, screen_width // 2 + 400, 500)
+        draw_text("Split hand 2 value: ", text_font, black, screen_width // 2 + 250, 540)
+        draw_text(str(user1.get_split_hand_2_value()), text_font, black, screen_width // 2 + 350, 540)
 
-        draw_text("Split hand 2 result: ", text_font, black, screen_width // 2 + 250, 125)
-        draw_text(str(user1.get_split_hand_2_result()), text_font, black, screen_width // 2 + 400, 125)
+        draw_text("Split hand 2 result: ", text_font, black, screen_width // 2 + 250, 230)
+        draw_text(str(user1.get_split_hand_2_result()), text_font, black, screen_width // 2 + 400, 230)
 
 
 
@@ -1811,14 +1812,14 @@ while running:
             final_image = load_string + image_file_name
             img = pygame.image.load(final_image)
             img = pygame.transform.scale(img, img_size)
-            screen.blit(img, (25 + (40 * i), 50 + (3 * i)))
+            screen.blit(img, (25 + (40 * i), 75 + (3 * i)))
             i += 1
 
-        draw_text("Your 3rd split score: ", text_font, black, screen_width // 2 + 250, 475)
-        draw_text(str(user1.get_split_hand_3_value()), text_font, black, screen_width // 2 + 400, 475)
+        draw_text("Split hand 3 value: ", text_font, black, screen_width // 2 + 250, 570)
+        draw_text(str(user1.get_split_hand_3_value()), text_font, black, screen_width // 2 + 350, 570)
 
-        draw_text("Split hand 3 result: ", text_font, black, screen_width // 2 + 250, 150)
-        draw_text(str(user1.get_split_hand_3_result()), text_font, black, screen_width // 2 + 400, 150)
+        draw_text("Split hand 3 result: ", text_font, black, screen_width // 2 + 250, 270)
+        draw_text(str(user1.get_split_hand_3_result()), text_font, black, screen_width // 2 + 400, 270)
 
     if user1.get_can_user_bet() is True:
         draw_text("Place your bets!", big_text_font, black, screen_width // 2 - 125, 350)
@@ -2303,15 +2304,15 @@ while running:
         draw_text("Dealer's hand value: ", text_font, black, screen_width // 2 + 250, 100)
         draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 400, 100)
 
-        draw_text("Turn result: ", text_font, black, screen_width // 2 + 250, 150)
-        draw_text(str(user1.get_turn_result()), text_font, black, screen_width // 2 + 325, 150)
+        draw_text("Hand result: ", text_font, black, screen_width // 2 + 250, 150)
+        draw_text(str(user1.get_turn_result()), text_font, black, screen_width // 2 + 350, 150)
 
         # Telling the user how many chips they gained or lost
         if user1.get_chips_gained_on_turn() > 0:
             chips_gained_text = "+" + str(user1.get_chips_gained_on_turn()) + " chips"
         else:
             chips_gained_text = str(user1.get_chips_gained_on_turn()) + " chips"
-        draw_text(chips_gained_text, text_font, black, screen_width // 2 + 325, 170)
+        draw_text(chips_gained_text, text_font, black, screen_width // 2 - 55, 350)
     else:
         new_turn_button = Button(
             screen,
@@ -2330,6 +2331,18 @@ while running:
         if user1.get_username() is None:
             draw_text("Enter username", big_text_font, black, screen_width // 2 - 120, 450)
             username_textbox.draw()
+
+    if user1.get_is_split_hand_active() is True:
+        pygame.draw.line(screen, (255, 0, 0), (30, 705), (130, 705), 3)
+
+    if user1.get_is_split_hand_2_active() is True:
+        pygame.draw.line(screen, (255, 0, 0), (30, 465), (130, 465), 3)
+
+    if user1.get_is_split_hand_3_active() is True:
+        pygame.draw.line(screen, (255, 0, 0), (30, 250), (130, 250), 3)
+
+    if user1.get_split_hand() != [] and user1.get_is_split_hand_active() is False:
+        pygame.draw.line(screen, (255, 0, 0), (screen_width // 2 - 90, 690), (screen_width // 2 + 50, 690), 3)
 
     if is_double_down_possible() is True:
         double_down_button.draw()
