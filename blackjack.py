@@ -2301,8 +2301,8 @@ while running:
             onClick=clear_table
         )
         new_turn_button.draw()
-        draw_text("Dealer's hand value: ", text_font, black, screen_width // 2 + 250, 100)
-        draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 400, 100)
+        draw_text("Dealer's hand value: ", text_font, black, screen_width // 2 - 80, 35)
+        draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 80, 35)
 
         draw_text("Hand result: ", text_font, black, screen_width // 2 + 250, 150)
         draw_text(str(user1.get_turn_result()), text_font, black, screen_width // 2 + 350, 150)
@@ -2312,7 +2312,7 @@ while running:
             chips_gained_text = "+" + str(user1.get_chips_gained_on_turn()) + " chips"
         else:
             chips_gained_text = str(user1.get_chips_gained_on_turn()) + " chips"
-        draw_text(chips_gained_text, text_font, black, screen_width // 2 - 55, 350)
+        draw_text(chips_gained_text, text_font, black, screen_width // 2 + 250, 110)
     else:
         new_turn_button = Button(
             screen,
@@ -2348,7 +2348,7 @@ while running:
         double_down_button.draw()
 
     if split_check() is True or split_check_2() is True or split_check_3() is True or split_check_4() is True:
-        if user1.get_split_count_this_turn() < 3:
+        if user1.get_split_count_this_turn() < 3 and user1.get_turn_result() == 'in-progress':
             split_button.draw()
 
     if game_over_check() is True:
