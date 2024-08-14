@@ -13,9 +13,13 @@ import pygame.freetype
 # TO-DO: add a counter over a split hand that shows how much money is riding on that hand. same for the counter of that
 # hand to show its value
 
-#TO-DO: add animations
+#TO-DO: at the end of each hand, tell user how many chips they won or lost.
+
+#TO-DO: add animations - maybe not needed
 
 #TO-DO: Add title screen, music, make look better
+
+#TO-DO: mobile formatting (separate repo probably)
 
 
 #BUG: Dealers cards go face up during two split hands (three total hands). need to check what's causing, and if chips
