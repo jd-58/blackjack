@@ -1058,10 +1058,7 @@ def initial_score_check():
     if user1.get_hand_value() == 21 and dealer.get_hand_value() != 21:  # Player gets natural 21 and dealer does not
         dealer.set_turn_result('Loss')
         user1.set_turn_result('Blackjack')
-        print("User turn result: ", user1.get_turn_result())
-        print("Dealer turn result: ", dealer.get_turn_result())
         is_turn_over()
-        print(is_turn_over())
         return
     elif (user1.get_hand_value() > 21 and user1.get_split_hand == []  # User busts
             or dealer.get_hand_value() == 21 and user1.get_hand_value != 21):  # Dealer gets natural blackjack
