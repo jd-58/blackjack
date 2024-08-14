@@ -13,19 +13,19 @@ import pygame.freetype
 # TO-DO: add a counter over a split hand that shows how much money is riding on that hand. same for the counter of that
 # hand to show its value
 
-#TO-DO: at the end of each hand, tell user how many chips they won or lost.
+# TO-DO: at the end of each hand, tell user how many chips they won or lost.
 
-#TO-DO: add animations - maybe not needed
+# TO-DO: add animations - maybe not needed
 
-#TO-DO: Add title screen, music, make look better
+# TO-DO: Add title screen, music, make look better
 
-#TO-DO: mobile formatting (separate repo probably)
+# TO-DO: mobile formatting (separate repo probably)
 
 
-#BUG: Dealers cards go face up during two split hands (three total hands). need to check what's causing, and if chips
+# UG: Dealers cards go face up during two split hands (three total hands). need to check what's causing, and if chips
 # are properly being distributed.
-#BUG: If you double down and get blackjack, test that you get the right amount of chips back
-#BUG: If dealer gets two aces, only once ace is changed to 1, even if the third card busts them. - should be fixed now
+# BUG: If you double down and get blackjack, test that you get the right amount of chips back
+# BUG: If dealer gets two aces, only once ace is changed to 1, even if the third card busts them. - should be fixed now
 
 # TO-DO: add insurance.
 
@@ -685,8 +685,8 @@ def hit_specific_cards():
                     card.set_value(1)
                     return
     if user1.get_hand_value() > 21:
-        user1.set_turn_result('loss')
-        dealer.set_turn_result('win')
+        user1.set_turn_result('Loss')
+        dealer.set_turn_result('Win')
     is_double_down_possible()
 
 
@@ -942,8 +942,8 @@ def hit():
                         card.set_value(1)
                         return
         if user1.get_split_hand_3_value() > 21:
-            user1.set_split_hand_3_result('loss')
-            dealer.set_split_hand_3_result('win')
+            user1.set_split_hand_3_result('Loss')
+            dealer.set_split_hand_3_result('Win')
             user1.set_is_split_hand_3_active(False)
         return
 
@@ -963,8 +963,8 @@ def hit():
                         card.set_value(1)
                         return
         if user1.get_split_hand_2_value() > 21:
-            user1.set_split_hand_2_result('loss')
-            dealer.set_split_hand_2_result('win')
+            user1.set_split_hand_2_result('Loss')
+            dealer.set_split_hand_2_result('Win')
             user1.set_is_split_hand_2_active(False)
         return
 
@@ -984,8 +984,8 @@ def hit():
                         card.set_value(1)
                         return
         if user1.get_split_hand_value() > 21:
-            user1.set_split_hand_result('loss')
-            dealer.set_split_hand_result('win')
+            user1.set_split_hand_result('Loss')
+            dealer.set_split_hand_result('Win')
             user1.set_is_split_hand_active(False)
         return
 
@@ -1006,8 +1006,8 @@ def hit():
     if user1.get_hand_value() > 21:
         if user1.get_split_hand():
             split_hand_score_check()
-        user1.set_turn_result('loss')
-        dealer.set_turn_result('win')
+        user1.set_turn_result('Loss')
+        dealer.set_turn_result('Win')
 
 
 def stand():
@@ -1036,14 +1036,14 @@ def initial_score_check():
     check_to_change_ace(dealer)
     if (user1.get_hand_value() > 21  # User busts
             or dealer.get_hand_value() == 21 and user1.get_hand_value != 21):  # Dealer gets natural blackjack
-        dealer.set_turn_result('win')
-        user1.set_turn_result('loss')
+        dealer.set_turn_result('Win')
+        user1.set_turn_result('Loss')
     elif user1.get_hand_value() == 21 and dealer.get_hand_value() != 21:  # Player gets natural 21 and dealer does not
-        dealer.set_turn_result('loss')
-        user1.set_turn_result('blackjack')
+        dealer.set_turn_result('Loss')
+        user1.set_turn_result('Blackjack')
     elif user1.get_hand_value() == 21 and dealer.get_hand_value() == 21:  # Both player and dealer get natural 21
-        dealer.set_turn_result('push')
-        user1.set_turn_result('push')
+        dealer.set_turn_result('Push')
+        user1.set_turn_result('Push')
 
 
 def refill_bankroll():
@@ -1051,7 +1051,7 @@ def refill_bankroll():
 
 
 def game_over_check():
-    if user1.get_turn_result() == 'loss':
+    if user1.get_turn_result() == 'Loss':
         if user1.get_bankroll() == 0:
             return True
         else:
@@ -1178,23 +1178,23 @@ def split_hand_score_check():
     if user1.get_split_hand_result() is not None:
         if 21 >= user1.get_split_hand_value() == dealer.get_hand_value():
             #  If the user and dealer tie
-            user1.set_split_hand_result('push')
-            dealer.set_split_hand_result('push')
+            user1.set_split_hand_result('Push')
+            dealer.set_split_hand_result('Push')
             return True
         elif user1.get_split_hand_value() == 21 and dealer.get_hand_value() != 21:  # User blackjack
-            user1.set_split_hand_result('blackjack')
-            dealer.set_split_hand_result('loss')
+            user1.set_split_hand_result('Blackjack')
+            dealer.set_split_hand_result('Loss')
             return True
         elif (dealer.get_hand_value() < user1.get_split_hand_value() <= 21  # Neither bust, user has higher hand
               or dealer.get_hand_value() > 21 >= user1.get_split_hand_value()):  # Dealer bust, user does not
-            user1.set_split_hand_result('win')
-            dealer.set_split_hand_result('loss')
+            user1.set_split_hand_result('Win')
+            dealer.set_split_hand_result('Loss')
             return True
         elif (user1.get_split_hand_value() > 21  # User bust
               or user1.get_split_hand_value() < dealer.get_hand_value() <= 21  # Neither bust, dealer has higher hand
               or dealer.get_hand_value() == 21):  # Dealer blackjack
-            user1.set_split_hand_result('loss')
-            dealer.set_split_hand_result('win')
+            user1.set_split_hand_result('Loss')
+            dealer.set_split_hand_result('Win')
             return True
     return False
 
@@ -1203,23 +1203,23 @@ def split_hand_2_score_check():
     if user1.get_split_hand_2_result() is not None:
         if 21 >= user1.get_split_hand_2_value() == dealer.get_hand_value():
             #  If the user and dealer tie
-            user1.set_split_hand_2_result('push')
-            dealer.set_split_hand_2_result('push')
+            user1.set_split_hand_2_result('Push')
+            dealer.set_split_hand_2_result('Push')
             return True
         elif user1.get_split_hand_2_value() == 21 and dealer.get_hand_value() != 21:  # User blackjack
-            user1.set_split_hand_2_result('blackjack')
-            dealer.set_split_hand_2_result('loss')
+            user1.set_split_hand_2_result('Blackjack')
+            dealer.set_split_hand_2_result('Loss')
             return True
         elif (dealer.get_hand_value() < user1.get_split_hand_2_value() <= 21  # Neither bust, user has higher hand
               or dealer.get_hand_value() > 21 >= user1.get_split_hand_2_value()):  # Dealer bust, user does not
-            user1.set_split_hand_2_result('win')
-            dealer.set_split_hand_2_result('loss')
+            user1.set_split_hand_2_result('Win')
+            dealer.set_split_hand_2_result('Loss')
             return True
         elif (user1.get_split_hand_2_value() > 21  # User bust
               or user1.get_split_hand_2_value() < dealer.get_hand_value() <= 21  # Neither bust, dealer has higher hand
               or dealer.get_hand_value() == 21):  # Dealer blackjack
-            user1.set_split_hand_2_result('loss')
-            dealer.set_split_hand_2_result('win')
+            user1.set_split_hand_2_result('Loss')
+            dealer.set_split_hand_2_result('Win')
             return True
     return False
 
@@ -1228,23 +1228,23 @@ def split_hand_3_score_check():
     if user1.get_split_hand_3_result() is not None:
         if 21 >= user1.get_split_hand_3_value() == dealer.get_hand_value():
             #  If the user and dealer tie
-            user1.set_split_hand_3_result('push')
-            dealer.set_split_hand_3_result('push')
+            user1.set_split_hand_3_result('Push')
+            dealer.set_split_hand_3_result('Push')
             return True
         elif user1.get_split_hand_3_value() == 21 and dealer.get_hand_value() != 21:  # User blackjack
-            user1.set_split_hand_3_result('blackjack')
-            dealer.set_split_hand_3_result('loss')
+            user1.set_split_hand_3_result('Blackjack')
+            dealer.set_split_hand_3_result('Loss')
             return True
         elif (dealer.get_hand_value() < user1.get_split_hand_2_value() <= 21  # Neither bust, user has higher hand
               or dealer.get_hand_value() > 21 >= user1.get_split_hand_2_value()):  # Dealer bust, user does not
-            user1.set_split_hand_3_result('win')
-            dealer.set_split_hand_3_result('loss')
+            user1.set_split_hand_3_result('Win')
+            dealer.set_split_hand_3_result('Loss')
             return True
         elif (user1.get_split_hand_3_value() > 21  # User bust
               or user1.get_split_hand_3_value() < dealer.get_hand_value() <= 21  # Neither bust, dealer has higher hand
               or dealer.get_hand_value() == 21):  # Dealer blackjack
-            user1.set_split_hand_3_result('loss')
-            dealer.set_split_hand_3_result('win')
+            user1.set_split_hand_3_result('Loss')
+            dealer.set_split_hand_3_result('Win')
             return True
     return False
 
@@ -1261,23 +1261,23 @@ def final_score_check():
     split_hand_score_check()
     if 21 >= user1.get_hand_value() == dealer.get_hand_value():
         #  If the user and dealer tie
-        user1.set_turn_result('push')
-        dealer.set_turn_result('push')
+        user1.set_turn_result('Push')
+        dealer.set_turn_result('Push')
         return
     elif user1.get_hand_value() == 21 and dealer.get_hand_value() != 21:  # User blackjack
-        user1.set_turn_result('blackjack')
-        dealer.set_turn_result('loss')
+        user1.set_turn_result('Blackjack')
+        dealer.set_turn_result('Loss')
         return
     elif (dealer.get_hand_value() < user1.get_hand_value() <= 21  # Neither bust, user has higher hand
           or dealer.get_hand_value() > 21 >= user1.get_hand_value()):  # Dealer bust, user does not
-        user1.set_turn_result('win')
-        dealer.set_turn_result('loss')
+        user1.set_turn_result('Win')
+        dealer.set_turn_result('Loss')
         return
     elif (user1.get_hand_value() > 21  # User bust
           or user1.get_hand_value() < dealer.get_hand_value() <= 21  # Neither bust, dealer has higher hand
           or dealer.get_hand_value() == 21):  # Dealer blackjack
-        user1.set_turn_result('loss')
-        dealer.set_turn_result('win')
+        user1.set_turn_result('Loss')
+        dealer.set_turn_result('Win')
         return
     return
 
@@ -1311,74 +1311,76 @@ def ready_to_draw_cards_check():
 
 def distribute_chips_from_pot():
     if user1.get_split_hand_result() is not None:
-        if user1.get_split_hand_result() == 'win' or user1.get_split_hand_result() == 'blackjack':
+        if user1.get_split_hand_result() == 'Win' or user1.get_split_hand_result() == 'Blackjack':
             user1.update_bankroll(2 * user1.get_amount_bet_on_split())
             user1.update_amount_of_chips_gained_on_turn(2 * user1.get_amount_bet_on_split())
             pot.update_bankroll(user1.get_amount_bet_on_split())
             user1.set_amount_bet_on_split(0)
-        elif user1.get_split_hand_result() == 'push':
+        elif user1.get_split_hand_result() == 'Push':
             user1.update_bankroll(user1.get_amount_bet_on_split())
             user1.update_amount_of_chips_gained_on_turn(user1.get_amount_bet_on_split())
             pot.update_bankroll(-user1.get_amount_bet_on_split())
             user1.set_amount_bet_on_split(0)
-        elif user1.get_split_hand_result() == 'loss':
+        elif user1.get_split_hand_result() == 'Loss':
             user1.update_amount_of_chips_gained_on_turn(-user1.get_amount_bet_on_split())
             pot.update_bankroll(user1.get_amount_bet_on_split())
             user1.set_amount_bet_on_split(0)
     if user1.get_split_hand_2_result() is not None:
-        if user1.get_split_hand_2_result() == 'win' or user1.get_split_hand_2_result() == 'blackjack':
+        if user1.get_split_hand_2_result() == 'Win' or user1.get_split_hand_2_result() == 'Blackjack':
             user1.update_bankroll(2 * user1.get_amount_bet_on_split_2())
             user1.update_amount_of_chips_gained_on_turn(2 * user1.get_amount_bet_on_split_2())
             pot.set_bankroll(0)
             user1.set_amount_bet_on_split_2(0)
-        elif user1.get_split_hand_2_result() == 'push':
+        elif user1.get_split_hand_2_result() == 'Push':
             user1.update_bankroll(user1.get_amount_bet_on_split_2())
             user1.update_amount_of_chips_gained_on_turn(user1.get_amount_bet_on_split_2())
             pot.set_bankroll(0)
             user1.set_amount_bet_on_split_2(0)
-        elif user1.get_split_hand_2_result() == 'loss':
+        elif user1.get_split_hand_2_result() == 'Loss':
             user1.update_amount_of_chips_gained_on_turn(-user1.get_amount_bet_on_split_2())
             user1.set_amount_bet_on_split_2(0)
             pot.set_bankroll(0)
     if user1.get_split_hand_3_result() is not None:
-        if user1.get_split_hand_3_result() == 'win' or user1.get_split_hand_3_result() == 'blackjack':
+        if user1.get_split_hand_3_result() == 'Win' or user1.get_split_hand_3_result() == 'Blackjack':
             user1.update_bankroll(2 * user1.get_amount_bet_on_split_3())
             user1.update_amount_of_chips_gained_on_turn(2 * user1.get_amount_bet_on_split_3())
             pot.set_bankroll(0)
             user1.set_amount_bet_on_split_3(0)
-        elif user1.get_split_hand_3_result() == 'push':
+        elif user1.get_split_hand_3_result() == 'Push':
             user1.update_bankroll(user1.get_amount_bet_on_split_3())
             user1.update_amount_of_chips_gained_on_turn(user1.get_amount_bet_on_split_3())
             pot.set_bankroll(0)
             user1.set_amount_bet_on_split_3(0)
-        elif user1.get_split_hand_3_result() == 'loss':
+        elif user1.get_split_hand_3_result() == 'Loss':
             user1.update_amount_of_chips_gained_on_turn(-user1.get_amount_bet_on_split_3())
             user1.set_amount_bet_on_split_3(0)
             pot.set_bankroll(0)
-    if user1.get_turn_result() == 'win':
+    if user1.get_turn_result() == 'Win':
         user1.update_bankroll(2 * user1.get_amount_bet())
         user1.update_amount_of_chips_gained_on_turn(2 * user1.get_amount_bet())
         pot.set_bankroll(0)
         user1.set_amount_bet(0)
-    elif user1.get_turn_result() == 'blackjack':
+    elif user1.get_turn_result() == 'Blackjack':
         user1.update_bankroll(math.floor(2.5 * user1.get_amount_bet()))
         user1.update_amount_of_chips_gained_on_turn(math.floor(2.5 * user1.get_amount_bet()))
         pot.set_bankroll(0)
         user1.set_amount_bet(0)
-    elif user1.get_turn_result() == 'push':
+    elif user1.get_turn_result() == 'Push':
         user1.update_bankroll(user1.get_amount_bet())
         user1.update_amount_of_chips_gained_on_turn(user1.get_amount_bet())
         pot.set_bankroll(0)
         user1.set_amount_bet(0)
-    elif user1.get_turn_result() == 'loss':
+    elif user1.get_turn_result() == 'Loss':
         user1.update_amount_of_chips_gained_on_turn(-user1.get_amount_bet())
         pot.set_bankroll(0)
         user1.set_amount_bet(0)
+
 
 def update_username():
     text_entered = str(username_textbox.getText())
     user1.set_username(text_entered)
     user1.set_can_user_bet(True)
+
 
 pygame.init()
 screen_width = 1280
@@ -1720,7 +1722,7 @@ while running:
     screen.fill("green")
 
     if user1.get_hand():
-        draw_text("Your cards are: ", text_font, black, screen_width // 2 - 80, 475)
+        draw_text("Your cards are: ", text_font, black, screen_width // 2 - 80, 470)
     # draw_text(str(user1.show_hand()), text_font, black, screen_width // 2 - 25, 600)
 
     if user1.get_username() is not None:
@@ -1776,10 +1778,10 @@ while running:
             i += 1
 
         draw_text("Split hand value: ", text_font, black, screen_width // 2 + 250, 510)
-        draw_text(str(user1.get_split_hand_value()), text_font, black, screen_width // 2 + 350, 510)
+        draw_text(str(user1.get_split_hand_value()), text_font, black, screen_width // 2 + 375, 510)
 
         draw_text("Split hand result: ", text_font, black, screen_width // 2 + 250, 190)
-        draw_text(str(user1.get_split_hand_result()), text_font, black, screen_width // 2 + 400, 190)
+        draw_text(str(user1.get_split_hand_result()), text_font, black, screen_width // 2 + 375, 190)
 
     if user1.get_split_hand_2_result() is not None:
         draw_text("Your 2nd split cards are: ", text_font, black, 30, 250)
@@ -1795,10 +1797,10 @@ while running:
             i += 1
 
         draw_text("Split hand 2 value: ", text_font, black, screen_width // 2 + 250, 540)
-        draw_text(str(user1.get_split_hand_2_value()), text_font, black, screen_width // 2 + 350, 540)
+        draw_text(str(user1.get_split_hand_2_value()), text_font, black, screen_width // 2 + 375, 540)
 
         draw_text("Split hand 2 result: ", text_font, black, screen_width // 2 + 250, 230)
-        draw_text(str(user1.get_split_hand_2_result()), text_font, black, screen_width // 2 + 400, 230)
+        draw_text(str(user1.get_split_hand_2_result()), text_font, black, screen_width // 2 + 375, 230)
 
 
 
@@ -1816,10 +1818,10 @@ while running:
             i += 1
 
         draw_text("Split hand 3 value: ", text_font, black, screen_width // 2 + 250, 570)
-        draw_text(str(user1.get_split_hand_3_value()), text_font, black, screen_width // 2 + 350, 570)
+        draw_text(str(user1.get_split_hand_3_value()), text_font, black, screen_width // 2 + 375, 570)
 
         draw_text("Split hand 3 result: ", text_font, black, screen_width // 2 + 250, 270)
-        draw_text(str(user1.get_split_hand_3_result()), text_font, black, screen_width // 2 + 400, 270)
+        draw_text(str(user1.get_split_hand_3_result()), text_font, black, screen_width // 2 + 375, 270)
 
     if user1.get_can_user_bet() is True:
         draw_text("Place your bets!", big_text_font, black, screen_width // 2 - 125, 350)
