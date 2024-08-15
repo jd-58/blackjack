@@ -2,7 +2,7 @@
 
 Welcome to my Blackjack game! Built in Python (using Pygame), this game allows you to play Blackjack anywhere! This includes splitting (up to 3 times), doubling down, insurance, and late surrender.
 
-![Screenshot of blackjack game homescreen](screenshot here)
+![Screenshot of blackjack game homescreen](screenshots/screenshot-double-down.png)
 
 ## Rules/Features
 - **6 Decks of cards:** 6 Decks of cards are in play. 
