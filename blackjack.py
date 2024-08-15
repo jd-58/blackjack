@@ -628,8 +628,9 @@ def draw_cards_button_func():
     deck.shuffle_deck()
     user1.set_can_user_bet(False)
     user1.draw_user_card(deck, 2, True)
-    # card1 = Card(11, 'ace', 'hearts')
-    # card2 = Card(10, '10', 'spades')
+    # card1 = Card(7, '7', 'hearts')
+    # card2 = Card(7, '7', 'spades')
+    # card2.add_to_name('5')
     # hand2 = [card1, card2]
     # user1.set_hand(hand2)
     dealer.draw_user_card(deck, 1, True)
@@ -2434,7 +2435,9 @@ while running:
             pressedColour=(0, 255, 0), radius=20,
             onClick=new_game
         )
+        new_game_button.draw()
         draw_text("Game Over", big_text_font, black, screen_width // 2 - 75, 350)
+    new_game_button.draw()
 
     blackjack_check()
     pygame.display.flip()
