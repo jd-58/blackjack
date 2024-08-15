@@ -14,7 +14,7 @@ Blackjacks that occur in split hands only payout twice the amount bet instead of
 ## Future Plans - Training a Blackjack AI Using Pytorch
 I am currently working on training an AI to play my Blackjack game using Pytorch. The goal is to see if the AI will be able to replicate ![perfect Blackjack strategy](https://www.blackjackapprenticeship.com/blackjack-strategy-charts/) on its own.
 
-## Getting Started
+## How to Play
 
 To run this project on your local machine, follow the following steps:
 <br>
