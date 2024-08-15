@@ -643,6 +643,10 @@ def draw_cards_button_func():
     initial_score_check()
     is_double_down_possible()
     split_check()
+    print(split_check())
+    user_hand = user1.get_hand()
+    for card in user_hand:
+        print(card.get_name())
     user1.set_are_cards_ready_to_be_drawn(False)
 
 
@@ -1669,7 +1673,7 @@ all_in_button_no_func = Button(
 split_button = Button(
     screen,
     screen_width // 2 - 50,  # X coordinate of the top-left corner
-    400,  # Y coordinate of the top-left corner
+    425,  # Y coordinate of the top-left corner
     75,
     25,
     text='Split',
@@ -2351,20 +2355,19 @@ while running:
         draw_text("Dealer's hand value: ", text_font, black, screen_width // 2 - 80, 35)
         draw_text(str(dealer.get_hand_value()), text_font, black, screen_width // 2 + 80, 35)
 
-    else:
+    elif is_turn_over() is False:
         new_turn_button = Button(
             screen,
             screen_width // 2 + 44350,  # X coordinate of the top-left corner
-            450,  # Y coordinate of the top-left corner
+            4550,  # Y coordinate of the top-left corner
             125,
             25,
             text='New Turn',
             fontSize=20, margin=20,
             inactiveColour=(255, 0, 0),
             pressedColour=(0, 255, 0), radius=20,
-            onClick=clear_table
         )
-        new_turn_button.draw()
+
 
         draw_text("Hand result: ", text_font, black, screen_width // 2 + 250, 150)
         draw_text(str(user1.get_turn_result()), text_font, black, screen_width // 2 + 350, 150)
