@@ -22,12 +22,7 @@ import pygame.freetype
 # TO-DO: mobile formatting (separate repo probably)
 
 
-# UG: Dealers cards go face up during two split hands (three total hands). need to check what's causing, and if chips
-# are properly being distributed.
-# BUG: If you double down and get blackjack, test that you get the right amount of chips back
-# BUG: If dealer gets two aces, only once ace is changed to 1, even if the third card busts them. - should be fixed now
-
-# TO-DO: add insurance.
+#TO - DO: game calls the turn over if dealer gets blackjack, before user can buy insurance or surrender
 
 
 class Card:
@@ -196,6 +191,9 @@ class User:
         self._cards_ready_to_be_drawn = False
         self._split_count_during_turn = 0
         self._chips_gained_on_turn = 0
+        self._insurance_amount = 0
+        self._has_insurance_been_taken = False
+        self._insurance_result = None
 
     def draw_user_card(self, game_deck, number_of_cards, is_face_up=True):
         """Adds a specified number of cards to the user's hand from the deck."""
@@ -237,9 +235,16 @@ class User:
         """Returns the amount of chips gained or lost on a turn"""
         return self._chips_gained_on_turn
 
+    def get_has_insurance_been_taken(self):
+        """Returns False if insurance hasn't been taken, True if it has"""
+        return self._has_insurance_been_taken
+
     def get_can_user_bet(self):
         """Returns True if the user is able to bet, False if not"""
         return self._can_bet
+
+    def get_insurance_result(self):
+        """Returns the current result of the insurance bet. None if insurance hasn't been taken"""
 
     def get_split_hand_result(self):
         """Returns the result of the current split hand. Is None if a split hand is not active"""
@@ -346,6 +351,10 @@ class User:
             current_value += card.get_value()
         return current_value
 
+    def get_insurance_amount(self):
+        """Returns the current amount of insurance"""
+        return self._insurance_amount
+
     def set_username(self, new_username):
         """Changes the user's username"""
         self._username = new_username
@@ -366,6 +375,14 @@ class User:
         """Changes whether a split hand is active"""
         self._is_split_hand_active = new_condition
 
+    def set_has_insurance_been_taken(self, new_condition):
+        """Changes whether insurance has been taken"""
+        self._has_insurance_been_taken = new_condition
+
+    def set_insurance_result(self, result):
+        """Changes the result of the insurance bet"""
+        self._insurance_result = result
+
     def set_is_split_hand_2_active(self, new_condition):
         """Changes whether split hand 2 is active"""
         self._is_split_hand_2_active = new_condition
@@ -381,6 +398,10 @@ class User:
     def set_hand(self, specified_hand):
         """Changes the user's hand. For testing purposes"""
         self._hand = specified_hand
+
+    def set_insurance_amount(self, new_amount):
+        """Changes the amount of insurance that has been taken"""
+        self._insurance_amount = new_amount
 
     def set_can_user_bet(self, new_value):
         """Changes whether the user can bet. True if they can, false if they cannot"""
@@ -1225,6 +1246,28 @@ def check_for_ace(user):
             return True
 
 
+def check_for_insurance():
+    dealer_hand = dealer.get_hand()
+    if dealer_hand != [] and user1.get_turn_result() == 'in-progress' and user1.get_has_insurance_been_taken() is False:
+        if dealer_hand[0].get_name() == 'ace':
+            return True
+        else:
+            return False
+    return False
+
+
+def get_insurance():
+    user1.set_has_insurance_been_taken(True)
+    user1.set_insurance_amount(user1.get_amount_bet() // 2)
+    user1.update_bankroll(-user1.get_insurance_amount())
+    if dealer.get_hand_value() == 21:
+        user1.set_insurance_result('Win')
+    else:
+        user1.set_insurance_result('Loss')
+
+
+
+
 def split_hand_score_check():
     if user1.get_split_hand_result() is not None:
         if 21 >= user1.get_split_hand_value() == dealer.get_hand_value():
@@ -1361,6 +1404,17 @@ def ready_to_draw_cards_check():
 
 
 def distribute_chips_from_pot():
+    if user1.get_has_insurance_been_taken() is True:
+        if user1.get_insurance_result() == 'Win':
+            user1.update_bankroll(user1.get_insurance_amount())
+            user1.update_amount_of_chips_gained_on_turn(user1.get_insurance_amount())
+            user1.set_insurance_amount(0)
+            user1.set_has_insurance_been_taken(False)
+            user1.set_insurance_result(None)
+        elif user1.get_insurance_result == 'Loss':
+            user1.set_insurance_amount(0)
+            user1.set_has_insurance_been_taken(False)
+            user1.set_insurance_result(None)
     if user1.get_split_hand_result() is not None:
         if user1.get_split_hand_result() == 'Win' or user1.get_split_hand_result() == 'Blackjack':
             user1.update_bankroll(2 * user1.get_amount_bet_on_split())
@@ -1506,6 +1560,19 @@ surrender_button = Button(
             inactiveColour=(255, 0, 0),
             pressedColour=(0, 255, 0), radius=20,
             onClick=surrender
+        )
+
+insurance_button = Button(
+            screen,
+            screen_width // 2 + 66550,  # X coordinate of the top-left corner
+            400,  # Y coordinate of the top-left corner
+            125,
+            25,
+            text='Insurance',
+            fontSize=20, margin=20,
+            inactiveColour=(255, 0, 0),
+            pressedColour=(0, 255, 0), radius=20,
+            onClick=get_insurance
         )
 
 no_bet_button = Button(
@@ -1837,6 +1904,35 @@ while running:
     five_hundred_dollar_chip_no_func.draw()
     one_thousand_dollar_chip_no_func.draw()
     all_in_button_no_func.draw()
+
+    if check_for_insurance() is True:
+        insurance_button = Button(
+            screen,
+            screen_width // 2 + 450,  # X coordinate of the top-left corner
+            300,  # Y coordinate of the top-left corner
+            125,
+            25,
+            text='Insurance',
+            fontSize=20, margin=20,
+            inactiveColour=(255, 0, 0),
+            pressedColour=(0, 255, 0), radius=20,
+            onClick=get_insurance
+        )
+        insurance_button.draw()
+    else:
+        insurance_button = Button(
+            screen,
+            screen_width // 2 + 66550,  # X coordinate of the top-left corner
+            4300,  # Y coordinate of the top-left corner
+            125,
+            25,
+            text='Insurance',
+            fontSize=20, margin=20,
+            inactiveColour=(255, 0, 0),
+            pressedColour=(0, 255, 0), radius=20,
+            onClick=get_insurance
+        )
+        insurance_button.draw()
 
     if surrender_check() is True:
         surrender_button = Button(
