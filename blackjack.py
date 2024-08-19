@@ -647,6 +647,15 @@ def draw_cards_button_func():
     user1.set_are_cards_ready_to_be_drawn(False)
 
 
+def surrender_check():
+    dealer_hand = dealer.get_hand()
+    if dealer_hand != [] and user1.get_turn_result() == 'in-progress':
+        if dealer_hand[0].get_value() == 9 or dealer_hand[0].get_value() == 10 or dealer_hand[0].get_name() == 'ace':
+            return True
+        else:
+            return False
+    return False
+
 def show_user_card_image():
     user_hand = user1.get_hand()
     i = 0
@@ -699,6 +708,16 @@ def hit_specific_cards():
         user1.set_turn_result('Loss')
         dealer.set_turn_result('Win')
     is_double_down_possible()
+
+
+def surrender():
+    user1.update_bankroll(user1.get_amount_bet() // 2)
+    user1.set_chips_gained_on_turn(user1.get_amount_bet() // 2)
+    user1.set_turn_result('Loss')
+    dealer.set_turn_result('Win')
+    user1.set_amount_bet(0)
+    pot.set_bankroll(0)
+
 
 
 def split_check():
@@ -1476,6 +1495,19 @@ refill_bankroll_button = Button(
     onClick=refill_bankroll
 )
 
+surrender_button = Button(
+            screen,
+            screen_width // 2 + 66550,  # X coordinate of the top-left corner
+            400,  # Y coordinate of the top-left corner
+            125,
+            25,
+            text='Surrender',
+            fontSize=20, margin=20,
+            inactiveColour=(255, 0, 0),
+            pressedColour=(0, 255, 0), radius=20,
+            onClick=surrender
+        )
+
 no_bet_button = Button(
     screen,
     screen_width // 2 + 420,  # X coordinate of the top-left corner
@@ -1805,6 +1837,36 @@ while running:
     five_hundred_dollar_chip_no_func.draw()
     one_thousand_dollar_chip_no_func.draw()
     all_in_button_no_func.draw()
+
+    if surrender_check() is True:
+        surrender_button = Button(
+            screen,
+            screen_width // 2 + 450,  # X coordinate of the top-left corner
+            350,  # Y coordinate of the top-left corner
+            125,
+            25,
+            text='Surrender',
+            fontSize=20, margin=20,
+            inactiveColour=(255, 0, 0),
+            pressedColour=(0, 255, 0), radius=20,
+            onClick=surrender
+        )
+        surrender_button.draw()
+    else:
+        surrender_button = Button(
+            screen,
+            screen_width // 2 + 66550,  # X coordinate of the top-left corner
+            400,  # Y coordinate of the top-left corner
+            125,
+            25,
+            text='Surrender',
+            fontSize=20, margin=20,
+            inactiveColour=(255, 0, 0),
+            pressedColour=(0, 255, 0), radius=20,
+            onClick=surrender
+        )
+        surrender_button.draw()
+
 
     if dealer.get_hand():
         draw_text("Dealer's cards", text_font, black, screen_width // 2 - 80, 70)
@@ -2307,7 +2369,7 @@ while running:
         )
         stand_button = Button(
             screen,
-            screen_width // 2 + 500,  # X coordinate of the top-left corner
+            screen_width // 2 + 450,  # X coordinate of the top-left corner
             400,  # Y coordinate of the top-left corner
             75,
             25,
