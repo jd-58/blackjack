@@ -2,7 +2,7 @@
 
 Welcome to my Blackjack game! Built in Python (using Pygame), this game allows you to play Blackjack anywhere! This includes splitting (up to 3 times), doubling down, insurance, and late surrender.
 
-![Screenshot of blackjack game homescreen](screenshot here)
+![Screenshot of blackjack game homescreen](screenshots/screenshot-split.png)
 
 ## Rules/Features
 - **6 Decks of cards:** 6 Decks of cards are in play. 
@@ -11,9 +11,10 @@ Blackjacks that occur in split hands only payout twice the amount bet instead of
 - **Doubling Down:** If the first two cards you are dealt total 9, 10, or 11, you can double down. This doubles your original bet. You are dealt only one additional card, and  must stand. Standard hand scoring then applies.
 - For additional information on Blackjack rules, ![click here.](https://bicyclecards.com/how-to-play/blackjack)
 
+## Future Plans - Training a Blackjack AI Using Pytorch
+I am currently working on training an AI to play my Blackjack game using Pytorch. The goal is to see if the AI will be able to replicate ![perfect Blackjack strategy](https://www.blackjackapprenticeship.com/blackjack-strategy-charts/) on its own.
 
-
-## Getting Started
+## How to Play
 
 To run this project on your local machine, follow the following steps:
 <br>
