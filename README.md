@@ -11,6 +11,7 @@ Blackjacks that occur in split hands only payout twice the amount bet instead of
 - **Doubling Down:** If the first two cards you are dealt total 9, 10, or 11, you can double down. This doubles your original bet. You are dealt only one additional card, and  must stand. Standard hand scoring then applies.
 - For additional information on Blackjack rules, ![click here.](https://bicyclecards.com/how-to-play/blackjack)
 
+## Running the Game
 To run this project on your local machine, follow the following steps:
 <br>
 
